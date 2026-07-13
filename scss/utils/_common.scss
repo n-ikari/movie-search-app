@@ -1,0 +1,93 @@
+@use './mixins' as *;
+
+/* 基本：CSSだけの挙動はこれまで通り */
+.sp-only {
+  display: block;
+  @include pc { display: none; }
+}
+
+.pc-only {
+  display: none;
+  @include pc { display: block; }
+}
+
+
+// ?エフェクト
+
+/* === ページ全体フェード === */
+html.page-preload body{
+  opacity: 0;
+}
+
+html.page-ready body{
+  opacity: 1;
+  transition: opacity var(--page-fade-duration) var(--page-fade-ease);
+}
+
+/* === 共通（初期状態） === */
+.fade-up,
+.fade-left,
+.fade-right,
+.fade-in {
+  opacity: 0;
+  will-change: opacity, transform;
+}
+
+/* 方向ごとに開始位置を設定 */
+.fade-up    { transform: translateY(12px); }
+.fade-left  { transform: translateX(-12px); }
+.fade-right { transform: translateX(12px); }
+.fade-in    { transform: none; }
+
+/* 表示状態 */
+.fade-up.is-inview,
+.fade-left.is-inview,
+.fade-right.is-inview,
+.fade-in.is-inview {
+  opacity: 1;
+  transition:
+    opacity var(--scroll-fade-duration) var(--scroll-fade-ease),
+    transform var(--scroll-fade-duration) var(--scroll-fade-ease);
+  transform: none;
+}
+
+/* モーション苦手な人向け */
+@media (prefers-reduced-motion: reduce){
+  html.page-preload body{ opacity: 1; }
+  html.page-ready body{ transition: none; }
+
+  .fade-up,
+  .fade-left,
+  .fade-right,
+  .fade-in,
+  .fade-up.is-inview,
+  .fade-left.is-inview,
+  .fade-right.is-inview,
+  .fade-in.is-inview {
+    opacity: 1;
+    transition: none;
+    transform: none;
+  }
+}
+
+
+// ディレイ用
+
+/* 個別ディレイ/時間/イージングを data-* で上書きできるように
+   ※既存の transition は各コンポーネント側で定義してOK */
+
+/* data-* から渡すカスタム値用（存在する時だけ効く） */
+:is(.fade-up, .fade-left, .fade-right, .fade-in).is-inview[data-fade-duration] {
+  transition-duration: var(--fade-duration);
+}
+
+:is(.fade-up, .fade-left, .fade-right, .fade-in).is-inview[data-fade-ease] {
+  transition-timing-function: var(--fade-ease);
+}
+
+/* 初期値では delay 0 にしておく（JSで必要分だけ付与） */
+:is(.fade-up, .fade-left, .fade-right, .fade-in) {
+  transition-delay: 0s;
+}
+
+

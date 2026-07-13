@@ -1,0 +1,418 @@
+// main.scss
+@use 'base' as *;
+@use 'layout' as *;
+@use 'components' as *;
+@use 'utils' as *;
+
+// ここからプロジェクト用CSS
+
+body {
+  font-family: 'Playfair Display', 'Noto Sans JP', sans-serif;
+  font-size: $font-size-base;
+  line-height: 1.6;
+  color: $primary-color;
+}
+
+a{
+  display: inline-block;
+  color: $primary-color;
+  opacity: 1;
+  transition: 0.3s all;
+  &:hover{
+    opacity: .6;
+  }
+}
+
+.hero {
+  height: calc(100svh - var(--fixed-header));
+  max-height: 810px;
+  padding: 120px 1rem;
+  background: url('../../sample-cafe/images/fv_pc.webp') no-repeat;
+  background-position: center;
+  background-size: cover;
+  text-align: center;
+  color: $clr-w;
+
+  @include flex(center, center, column);
+
+  @include sp {
+    min-height: 500px;
+    padding: 40px 1rem;
+    background: url('../../sample-cafe/images/fv_sp.webp') no-repeat;
+    background-position: center;
+    background-size: cover;
+  }
+
+  p {
+    margin-bottom: 40px;
+    font-weight: $fw-r;
+    font-size: r(24);
+    letter-spacing: 0.09em;
+    text-shadow: var(--textshadow);
+
+    @include sp {
+      font-size: r(20);
+    }
+  }
+
+  .heading_01 {
+    width: 100%;
+    margin-bottom: 40px;
+    font-size: r(64);
+    line-height: 1.2;
+    letter-spacing: 0.1em;
+    text-shadow: var(--textshadow);
+
+    @include flex(center, center, column, 1rem);
+
+    @include sp {
+      font-size: r(48);
+    }
+
+    span {
+      font-weight: $fw-r;
+      font-size: r(16);
+      text-shadow: var(--textshadow);
+
+      @include sp {
+        font-size: r(14);
+      }
+    }
+
+    .pc-only {
+      display: inline;
+    }
+  }
+}
+
+.heading_02 {
+  margin-bottom: 60px;
+
+  @include flex(center, center);
+
+  @include sp {
+    margin-bottom: 40px;
+  }
+
+  span {
+    display: inline-block;
+    padding: 0 1rem 8px;
+    border-bottom: 1px solid $accent-color;
+    font-size: r(40);
+    line-height: 1.2;
+
+    @include sp {
+      font-size: r(32);
+    }
+  }
+}
+
+.heading_02--circle {
+  margin-bottom: 60px;
+  font-size: r(32);
+  text-align: center;
+
+  @include sp {
+    margin-bottom: 40px;
+    font-size: r(28);
+  }
+
+  span {
+    position: relative;
+    padding-left: 16px;
+
+    &::before {
+      position: absolute;
+      top: 20px;
+      left: 0;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: $accent-color;
+      content: '';
+
+      @include sp {
+        top: 14px;
+      }
+    }
+  }
+}
+
+.heading_03--arrow {
+  position: relative;
+  font-weight: $fw-m;
+  font-size: clamp(1.125rem, 0.696rem + 0.89vw, 1.5rem); // 18 24
+  text-align: right;
+
+  @include sp {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+  }
+
+  span {
+    position: relative;
+    padding-right: 36px;
+
+    @include sp {
+      padding-right: 30px;
+    }
+
+    &::before {
+      display: inline-block;
+      position: absolute;
+      top: 50%;
+      right: 0;
+      width: 28px;
+      height: 28px;
+      background: url('../../sample-cafe/images/arrow.svg') no-repeat;
+      background-size: contain;
+      transform: translateY(-50%) rotate(90deg);
+      content: '';
+
+      @include sp {
+        width: 24px;
+        height: 24px;
+      }
+    }
+  }
+}
+
+.heading_03--bb {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid $accent-color;
+  font-size: r(16);
+
+  // padding: 0 0 8px;
+  line-height: 1.6;
+}
+
+section {
+  padding-block: 60px;
+
+  @include sp {
+    padding-block: 40px;
+  }
+
+  & > .inner {
+    width: 90%;
+    max-width: 1200px;
+    margin-inline: auto;
+  }
+
+  &.bg-c1 {
+    background: $bg-color;
+  }
+
+  &.bg-c2 {
+    background: $primary-color;
+    color: #fff;
+  }
+}
+
+.card__list {
+  flex-wrap: wrap;
+  width: 100%;
+
+  @include flex(center, center, $gap: 24px);
+
+  @include sp {
+    gap: 1rem;
+
+    // flex-direction: column;
+  }
+}
+
+.card__item {
+  width: calc(100% / 3 - 24px);
+
+  @include sp {
+    width: calc(100% / 2 - 16px);
+  }
+
+  a {
+    display: block;
+    opacity: 1;
+    transition: transform 0.3s ease;
+
+    .img_box {
+      margin-bottom: 0.5rem;
+      overflow: hidden; // はみ出し防止
+      border-radius: 8px;
+    }
+
+    img {
+      transition: transform 0.3s ease; // アニメーション
+    }
+
+    &:hover {
+      opacity: 0.7;
+
+      img {
+        transform: scale(1.05); // 拡大
+      }
+    }
+  }
+}
+
+.card-2__list {
+  display: grid;
+  justify-content: center;
+  gap: 48px;
+  grid-template-columns: repeat(auto-fit, minmax(47%, 1fr));
+
+  @include sp {
+    grid-template-columns: repeat(auto-fit, minmax(100%, 1fr));
+  }
+
+  .card-2__item {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    gap: 24px;
+
+    @include sp {
+      gap: 1rem;
+    }
+  }
+
+  .card-2__img {
+    flex-shrink: 0;
+    max-width: 169px;
+    overflow: hidden;
+
+    @include sp {
+      max-width: 137px;
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 4/3;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+  }
+
+  .card-2__text {
+    width: 100%;
+    border-bottom: 1px solid $accent-color;
+    font-weight: $fw-r;
+    text-align: right;
+
+    @include sp {
+      text-align: left;
+    }
+  }
+
+  .card-2__name {
+    font-size: clamp(1.125rem, 0.696rem + 0.89vw, 1.5rem); // 18 24
+  }
+
+  .card-2__price {
+    font-size: clamp(1.5rem, 0.929rem + 1.19vw, 2rem); // 24 32
+    span {
+      font-size: 0.6em;
+    }
+  }
+}
+
+.concept {
+  &__text {
+    margin-bottom: 60px;
+    font-weight: $fw-r;
+    font-size: r(20);
+    line-height: 3;
+    letter-spacing: 0.1em;
+    text-align: center;
+
+    @include sp {
+      font-size: r(16);
+    }
+  }
+
+  &__img_wrap {
+    overflow: hidden;
+    border-radius: 8px;
+
+    @include flex(center, center, row, 0);
+
+    @include sp {
+      flex-direction: column;
+    }
+
+    img {
+      aspect-ratio: 600/357;
+      object-fit: cover;
+
+      @include sp {
+        aspect-ratio: 4/3;
+      }
+    }
+  }
+}
+
+.access {
+  &__flex-group {
+    @include flex(center, start, row, 2rem);
+
+    @include sp {
+      flex-direction: column-reverse;
+    }
+  }
+
+  .map,
+  .access__list {
+    width: 50%;
+
+    @include sp {
+      width: 100%;
+    }
+  }
+
+  .map {
+    iframe {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 600/477;
+      overflow: hidden;
+
+      @include sp {
+        aspect-ratio: 343/206;
+      }
+    }
+  }
+
+  &__list {
+    padding-block: clamp(0rem, -3.429rem + 7.14vw, 3rem); // 0 48
+    text-align: center;
+
+    @include flex(start, center, column, r(32));
+
+    @include sp {
+      padding-block: r(24);
+    }
+  }
+
+  &__item {
+    p {
+      font-size: clamp(1rem, 0.824rem + 0.75vw, 1.5rem);
+
+      span {
+        padding-inline: 1rem;
+      }
+    }
+  }
+}
+
+.reservation {
+  text-align: center;
+
+  .tel {
+    margin-bottom: 40px;
+    font-weight: $fw-b;
+    font-size: r(40);
+  }
+}

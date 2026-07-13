@@ -1,0 +1,38 @@
+// scss/base/_typography.scss
+// 👉 「ベーススタイル」カテゴリ
+// body や h1〜h6、p などのHTML要素に直接当てる初期スタイル
+// ITCSS なら Base（ベース層）
+// SMACSS なら Base
+
+@use './variables' as *; // ← 同じフォルダ内の _variables.scss を読み込む
+/* 全体をスムーススクロール（ユーザーの低速設定は尊重） */
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: bold;
+}
+
+a{
+  display: inline-block;
+  color: #333;
+  opacity: 1;
+  transition: 0.3s all;
+  &:hover{
+    opacity: .6;
+  }
+}
+
+img{
+  width: 100%;
+  max-width: 100%;
+  vertical-align: bottom;
+}
+
+

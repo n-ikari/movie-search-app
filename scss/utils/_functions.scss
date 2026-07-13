@@ -1,0 +1,7 @@
+@use "sass:math";
+
+// px → rem 変換
+@function r($px) {
+  @return #{math.div($px, 16)}rem;
+}
+

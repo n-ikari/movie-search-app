@@ -1,0 +1,100 @@
+@use "sass:map";
+@use '../base/variables' as *;
+
+// flex 中央寄せ
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+// *flex
+@mixin flex($justify: flex-start, $align: stretch, $direction: row, $gap: null) {
+  display: flex;
+  flex-direction: $direction;
+  justify-content: $justify;
+  align-items: $align;
+
+  @if $gap {
+    gap: $gap;
+  }
+}
+
+
+// *レスポンシブ
+// =============================
+// Breakpoints（基準を一括管理）
+// =============================
+$bp-sp: 768px;           // SP上限
+$bp-sp2: 992px;           // タブレット上限（案件都合の中間）
+$bp-pc: $bp-sp + 1px;    // 769px〜
+$bp-pc2: $bp-sp2 + 1px;   // 993px〜
+
+$bp-pc3: 1200px;
+$bp-pc4: 1300px;
+$bp-pc5: 1400px;
+$bp-pc6: 1600px;
+
+// 取り出し用マップ（必要ならキー増やすだけ）
+$breakpoints: (
+  sp:   $bp-sp,
+  sp2:  $bp-sp2,
+  pc:   $bp-pc,
+  pc2:  $bp-pc2,
+  pc3:  $bp-pc3,
+  pc4:  $bp-pc4,
+  pc5:  $bp-pc5,
+  pc6:  $bp-pc6
+);
+
+// 値取得ヘルパー
+@function bp($key) {
+  @return map.get($breakpoints, $key);
+}
+
+// =============================
+// 汎用 mixin（これが本体）
+// =============================
+@mixin up($key) { // min-width
+  @media (min-width: bp($key)) { @content; }
+}
+
+@mixin down($key) { // max-width
+  @media (max-width: bp($key)) { @content; }
+}
+
+@mixin between($from, $to) { // min〜max
+  @media (min-width: bp($from)) and (max-width: bp($to)) { @content; }
+}
+
+// =============================
+// エイリアス（読みやすさ用）
+// 必要なやつだけ使えばOK
+// =============================
+
+// 〜768
+@mixin sp   { @include down(sp) { @content; } }
+
+// 〜992
+@mixin sp2  { @include down(sp2) { @content; } }
+
+// 769〜
+@mixin pc   { @include up(pc) { @content; } }
+
+// 993〜
+@mixin pc2  { @include up(pc2) { @content; } }
+
+// 1200 / 1300 / 1400 / 1600 以上（たまに使う想定）
+@mixin pc3  { @include up(pc3) { @content; } }
+@mixin pc4  { @include up(pc4) { @content; } }
+@mixin pc5  { @include up(pc5) { @content; } }
+@mixin pc6  { @include up(pc6) { @content; } }
+
+// 印刷は別管理
+@mixin print { @media print { @content; } }
+
+// =============================
+// パーツmixin
+// =============================
+
+

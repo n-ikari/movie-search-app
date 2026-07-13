@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Movie Search App</title>
+    <link rel="stylesheet" href="css/style.css">
+    <meta name="robots" content="noindex , nofollow" />
+  </head>
+
+  <body>
+
+    <div class="container">
+      <h1>映画検索</h1>
+      <div class="l-serchWrap">
+        <div class="l-sortArea">
+          <select id="genreFilter">
+            <option value="">すべて</option>
+          </select>
+          <select id="sortSelect">
+            <option value="popularity.desc">人気順</option>
+            <option value="vote_average.desc">評価順</option>
+            <option value="primary_release_date.desc">公開日順</option>
+          </select>
+          <label>
+            <input type="checkbox" id="nowPlayingCheck">
+            最近1ヶ月
+          </label>
+        </div>
+        <div class="l-serchArea"> <input type="text" id="searchInput" placeholder="映画名で検索">
+          <button id="searchBtn">検索</button>
+        </div>
+      </div>
+      <div id="currentState"></div>
+      <a class="pageLink" href="favorites.html">❤&nbsp;お気に入り一覧</a>
+
+
+
+      <div id="movieList" class="grid"></div>
+      <div class="pageNav">
+        <button id="prevBtn">前へ</button>
+        <button id="nextBtn">次へ</button>
+        <span id="pageInfo"></span>
+      </div>
+    </div>
+
+
+    <div id="modal" class="modal hidden">
+      <div class="modal-content">
+        <button id="modalClose">✕</button>
+        <div class="modalInner">
+          <div id="modalLoading" class="modalLoading">読み込み中...</div>
+          <div class="modalGridLeft">
+            <img id="modalImg">
+          </div>
+          <div class="modalGridRight">
+            <div class="modalTitleRow">
+              <h2 id="modalTitle"></h2>
+              <button id="modalFavBtn" class="favBtn modalFavBtn" type="button">❤</button>
+            </div>
+
+            <p id="modalDate"></p>
+            <p id="modalCountry"></p>
+            <p id="modalScore" class="score"></p>
+            <p id="modalOverview"></p>
+            <p id="modalGenres"></p>
+          </div>
+          <div id="modalVideo" class="modalVideo"></div>
+        </div>
+      </div>
+    </div>
+    <div id="toast" class="toast"></div>
+
+
+    <script src="js/card.js"></script>
+    <script type="module" src="js/modal.js"></script>
+    <script type="module" src="js/script.js"></script>
+
+  </body>
+
+</html>
