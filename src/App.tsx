@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import type { FormEvent } from 'react';
 import MovieCard from './components/MovieCard';
 import { fetchMovies } from './services/tmdbApi';
 import { formatMovie } from './utils/formatMovie';
@@ -9,11 +10,13 @@ function App() {
   // moviesという状態を作る。中身はMovie型の配列。初期値は空配列。更新するときはsetMoviesを使う
   // 「映画一覧 movies をReactに管理してもらう。変更するときは setMovies()」
   const [movies, setMovies] = useState<Movie[]>([]);
+  const [query, setQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     async function loadMovies() {
       try {
-        const data = await fetchMovies();
+        const data = await fetchMovies(searchQuery);
         const formattedMovies = data.results.map(formatMovie);
 
         setMovies(formattedMovies);
@@ -23,7 +26,13 @@ function App() {
     }
 
     loadMovies();
-  }, []);
+    // 初回表示時 ＋ searchQuery が変わったときに実行
+  }, [searchQuery]);
+  // Enterで検索できるように
+  function handleSearch(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setSearchQuery(query);
+  }
 
   return (
     <main className="container">
@@ -47,12 +56,18 @@ function App() {
           </label>
         </div>
 
-        <div className="l-serchArea">
-          <input type="text" id="searchInput" placeholder="映画名で検索" />
-          <button type="button" id="searchBtn">
+        <form className="l-serchArea" onSubmit={handleSearch}>
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="映画名で検索"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+          />
+          <button type="submit" id="searchBtn">
             検索
           </button>
-        </div>
+        </form>
       </div>
 
       <div id="currentState"></div>
