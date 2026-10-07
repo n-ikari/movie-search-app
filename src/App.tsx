@@ -186,9 +186,13 @@ function App() {
 
       {error && <p className="error-message">{error}</p>}
       <div id="movieList" className="grid">
-        {loading
-          ? Array.from({ length: 6 }).map((_, index) => <div key={index} className="skeleton skeleton-card"></div>)
-          : movies.map(movie => <MovieCard key={movie.id} movie={movie} />)}
+        {loading ? (
+          Array.from({ length: 6 }).map((_, index) => <div key={index} className="skeleton skeleton-card"></div>)
+        ) : !error && movies.length === 0 ? (
+          <p>データがありません</p>
+        ) : (
+          movies.map(movie => <MovieCard key={movie.id} movie={movie} />)
+        )}
       </div>
 
       <div className="pageNav">
