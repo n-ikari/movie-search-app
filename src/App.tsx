@@ -39,11 +39,13 @@ function App() {
   const [genre, setGenre] = useState('');
   // 選択した並び順をReactに管理させる
   const [sort, setSort] = useState('popularity.desc');
+  // 「最近1ヶ月」のチェック状態をReactに管理させる
+  const [nowPlaying, setNowPlaying] = useState(false);
 
   useEffect(() => {
     async function loadMovies() {
       try {
-        const data = await fetchMovies(searchQuery, genre, sort);
+        const data = await fetchMovies(searchQuery, genre, sort, nowPlaying);
         const formattedMovies = data.results.map(formatMovie);
 
         setMovies(formattedMovies);
@@ -53,8 +55,8 @@ function App() {
     }
 
     loadMovies();
-    // 初回表示時 ＋ searchQuery、genre、sort が変わる → useEffectが動く → fetchMovies(searchQuery, genre, sort)実行
-  }, [searchQuery, genre, sort]);
+    // 初回表示時 ＋ searchQuery、genre、sort、nowPlaying が変わる → useEffectが動く → fetchMovies()実行
+  }, [searchQuery, genre, sort, nowPlaying]);
   // Enterで検索できるように
   // 映画名検索 → ジャンルを解除
   // ジャンル選択 → 映画名検索を解除＋検索欄も空にする
@@ -93,7 +95,12 @@ function App() {
           </select>
 
           <label>
-            <input type="checkbox" id="nowPlayingCheck" />
+            <input
+              type="checkbox"
+              id="nowPlayingCheck"
+              checked={nowPlaying}
+              onChange={e => setNowPlaying(e.target.checked)}
+            />
             最近1ヶ月
           </label>
         </div>
