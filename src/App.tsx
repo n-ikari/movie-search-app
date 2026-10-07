@@ -54,10 +54,14 @@ function App() {
   const [totalPages, setTotalPages] = useState(1);
   // APIから返された映画の総件数をReactに管理させる
   const [totalResults, setTotalResults] = useState(0);
+  // APIから映画データを取得中かどうかをReactに管理させる
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     async function loadMovies() {
       try {
+        setLoading(true);
+
         const data = await fetchMovies(searchQuery, genre, sort, nowPlaying, page);
         const formattedMovies = data.results.map(formatMovie);
 
@@ -67,6 +71,10 @@ function App() {
         setTotalResults(data.total_results);
       } catch (error) {
         console.error(error);
+      } finally {
+        // loading を false に戻す処理
+        // finallyで成功・失敗に関係なく通信が終わったら解除する
+        setLoading(false);
       }
     }
 
@@ -172,9 +180,9 @@ function App() {
       </a>
 
       <div id="movieList" className="grid">
-        {movies.map(movie => (
-          <MovieCard key={movie.id} movie={movie} />
-        ))}
+        {loading
+          ? Array.from({ length: 6 }).map((_, index) => <div key={index} className="skeleton skeleton-card"></div>)
+          : movies.map(movie => <MovieCard key={movie.id} movie={movie} />)}
       </div>
 
       <div className="pageNav">
