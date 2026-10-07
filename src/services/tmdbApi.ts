@@ -10,14 +10,20 @@ type TmdbMovieResponse = {
   total_results: number;
 };
 
-export async function fetchMovies(query = ''): Promise<TmdbMovieResponse> {
+export async function fetchMovies(query = '', genre = ''): Promise<TmdbMovieResponse> {
   const url = query
     ? `${BASE_URL}/search/movie` +
       `?api_key=${API_KEY}` +
       `&language=ja-JP` +
       `&page=1` +
       `&query=${encodeURIComponent(query)}`
-    : `${BASE_URL}/discover/movie` + `?api_key=${API_KEY}` + `&language=ja-JP` + `&page=1` + `&sort_by=popularity.desc`;
+    : `${BASE_URL}/discover/movie` +
+      `?api_key=${API_KEY}` +
+      `&language=ja-JP` +
+      `&page=1` +
+      `&sort_by=popularity.desc` +
+      // ジャンル指定がある場合のみ絞り込み条件を追加
+      (genre ? `&with_genres=${genre}` : '');
 
   const response = await fetch(url);
 
