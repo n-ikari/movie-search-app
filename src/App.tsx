@@ -122,6 +122,13 @@ function App() {
     currentStateText += `並び: ${sortMap[sort as keyof typeof sortMap]}`;
   }
 
+  // ページ切り替え時に画面上部へスクロールする
+  function scrollTop() {
+    window.scrollTo({
+      top: 0,
+    });
+  }
+
   return (
     <main className="container">
       <h1>映画検索</h1>
@@ -196,11 +203,25 @@ function App() {
       </div>
 
       <div className="pageNav">
-        <button type="button" id="prevBtn" disabled={page === 1} onClick={() => setPage(page - 1)}>
+        <button
+          type="button"
+          id="prevBtn"
+          disabled={page === 1}
+          onClick={() => {
+            setPage(page - 1);
+            scrollTop();
+          }}>
           前へ
         </button>
 
-        <button type="button" id="nextBtn" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
+        <button
+          type="button"
+          id="nextBtn"
+          disabled={page >= totalPages}
+          onClick={() => {
+            setPage(page + 1);
+            scrollTop();
+          }}>
           次へ
         </button>
 
