@@ -1,18 +1,32 @@
+import { useState } from 'react';
 import type { Movie } from '../types/movie';
 
 type MovieCardProps = {
   movie: Movie;
   isFavorite?: boolean;
+  onToggleFavorite: (movie: Movie) => void;
 
   // MovieCardには movie を必ず渡してください。
   // その movie は Movie 型でなければいけません。
   // isFavorite は省略可能ですが、渡すならbooleanです。
 };
 
-function MovieCard({ movie, isFavorite = false }: MovieCardProps) {
+function MovieCard({ movie, isFavorite = false, onToggleFavorite }: MovieCardProps) {
+  const [isPopping, setIsPopping] = useState(false);
   return (
     <div className="card fadeIn" data-id={movie.id}>
-      <button type="button" className={`favBtn ${isFavorite ? 'active' : ''}`} aria-label="お気に入り">
+      <button
+        type="button"
+        className={`favBtn ${isFavorite ? 'active' : ''} ${isPopping ? 'pop' : ''}`}
+        aria-label="お気に入り"
+        onClick={event => {
+          event.stopPropagation();
+          setIsPopping(true);
+          onToggleFavorite(movie);
+        }}
+        onAnimationEnd={() => {
+          setIsPopping(false);
+        }}>
         ❤
       </button>
 

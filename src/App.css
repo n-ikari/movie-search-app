@@ -226,3 +226,69 @@
     transform: translateY(0);
   }
 }
+
+/* お気に入りボタン */
+.favBtn {
+  color: #808080;
+  -webkit-text-fill-color: #808080;
+  -webkit-text-stroke: 1px #fff;
+}
+
+/* お気に入り登録済み */
+.favBtn.active {
+  color: #ff69b4;
+  -webkit-text-fill-color: #ff69b4;
+  -webkit-text-stroke: 1px #fff;
+}
+
+/* お気に入りクリック時 */
+.favBtn.pop {
+  animation: favoritePop 0.4s ease;
+}
+
+@keyframes favoritePop {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.3);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* トースト用 */
+/* お気に入り登録・削除時のToast */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
+  z-index: 9999;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-10px);
+}
+
+.toast.add {
+  background: rgba(255, 105, 180, 0.9);
+}
+
+.toast.remove {
+  background: rgba(51, 51, 51, 0.9);
+}

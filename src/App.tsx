@@ -4,6 +4,7 @@ import MovieCard from './components/MovieCard';
 import { fetchMovies } from './services/tmdbApi';
 import { formatMovie } from './utils/formatMovie';
 import type { Movie } from './types/movie';
+import { loadFavorites, saveFavorites } from './utils/favoritesStore';
 import './App.css';
 
 // 選択肢（ジャンル）をReactで表示する。固定データ。
@@ -39,6 +40,13 @@ function App() {
   // moviesという状態を作る。中身はMovie型の配列。初期値は空配列。更新するときはsetMoviesを使う
   // 「映画一覧 movies をReactに管理してもらう。変更するときは setMovies()」
   const [movies, setMovies] = useState<Movie[]>([]);
+  // お気に入りをlocalStorageから読み込んで管理する
+  const [favorites, setFavorites] = useState<Movie[]>(loadFavorites);
+  // トースト用
+  const [toast, setToast] = useState<{
+    message: string;
+    type: 'add' | 'remove';
+  } | null>(null);
   const [query, setQuery] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   // 選択したジャンルをReactに管理させる
@@ -128,6 +136,24 @@ function App() {
       top: 0,
     });
   }
+  // お気に入り
+  function toggleFavorite(movie: Movie) {
+    const exists = favorites.some(favorite => favorite.id === movie.id);
+
+    const newFavorites = exists ? favorites.filter(favorite => favorite.id !== movie.id) : [...favorites, movie];
+
+    setFavorites(newFavorites);
+    saveFavorites(newFavorites);
+
+    setToast({
+      message: exists ? 'お気に入りから削除しました' : 'お気に入りに追加しました',
+      type: exists ? 'remove' : 'add',
+    });
+
+    setTimeout(() => {
+      setToast(null);
+    }, 2000);
+  }
 
   return (
     <main className="container">
@@ -198,7 +224,14 @@ function App() {
         ) : !error && movies.length === 0 ? (
           <p>データがありません</p>
         ) : (
-          movies.map(movie => <MovieCard key={movie.id} movie={movie} />)
+          movies.map(movie => (
+            <MovieCard
+              key={movie.id}
+              movie={movie}
+              isFavorite={favorites.some(favorite => favorite.id === movie.id)}
+              onToggleFavorite={toggleFavorite}
+            />
+          ))
         )}
       </div>
 
@@ -229,6 +262,7 @@ function App() {
           {(page - 1) * 20 + 1}-{Math.min(page * 20, totalResults)}件 / {totalResults}件
         </span>
       </div>
+      {toast && <div className={`toast ${toast.type} show`}>{toast.message}</div>}
     </main>
   );
 }
