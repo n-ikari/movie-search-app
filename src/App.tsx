@@ -1,122 +1,85 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react';
+import MovieCard from './components/MovieCard';
+import { fetchMovies } from './services/tmdbApi';
+import { formatMovie } from './utils/formatMovie';
+import type { Movie } from './types/movie';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  // moviesという状態を作る。中身はMovie型の配列。初期値は空配列。更新するときはsetMoviesを使う
+  // 「映画一覧 movies をReactに管理してもらう。変更するときは setMovies()」
+  const [movies, setMovies] = useState<Movie[]>([]);
+
+  useEffect(() => {
+    async function loadMovies() {
+      try {
+        const data = await fetchMovies();
+        const formattedMovies = data.results.map(formatMovie);
+
+        setMovies(formattedMovies);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    loadMovies();
+  }, []);
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <main className="container">
+      <h1>映画検索</h1>
+
+      <div className="l-serchWrap">
+        <div className="l-sortArea">
+          <select id="genreFilter">
+            <option value="">すべて</option>
+          </select>
+
+          <select id="sortSelect">
+            <option value="popularity.desc">人気順</option>
+            <option value="vote_average.desc">評価順</option>
+            <option value="primary_release_date.desc">公開日順</option>
+          </select>
+
+          <label>
+            <input type="checkbox" id="nowPlayingCheck" />
+            最近1ヶ月
+          </label>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
+
+        <div className="l-serchArea">
+          <input type="text" id="searchInput" placeholder="映画名で検索" />
+          <button type="button" id="searchBtn">
+            検索
+          </button>
         </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
+      </div>
+
+      <div id="currentState"></div>
+
+      <a className="pageLink" href="#">
+        ❤&nbsp;お気に入り一覧
+      </a>
+
+      <div id="movieList" className="grid">
+        {movies.map(movie => (
+          <MovieCard key={movie.id} movie={movie} />
+        ))}
+      </div>
+
+      <div className="pageNav">
+        <button type="button" id="prevBtn">
+          前へ
         </button>
-      </section>
 
-      <div className="ticks"></div>
+        <button type="button" id="nextBtn">
+          次へ
+        </button>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+        <span id="pageInfo"></span>
+      </div>
+    </main>
+  );
 }
 
-export default App
+export default App;
