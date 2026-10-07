@@ -56,11 +56,14 @@ function App() {
   const [totalResults, setTotalResults] = useState(0);
   // APIから映画データを取得中かどうかをReactに管理させる
   const [loading, setLoading] = useState(false);
+  // APIから映画データを取得できなかった場合のエラーメッセージを管理する
+  const [error, setError] = useState('');
 
   useEffect(() => {
     async function loadMovies() {
       try {
         setLoading(true);
+        setError(''); // 前回のエラーを消す
 
         const data = await fetchMovies(searchQuery, genre, sort, nowPlaying, page);
         const formattedMovies = data.results.map(formatMovie);
@@ -71,6 +74,8 @@ function App() {
         setTotalResults(data.total_results);
       } catch (error) {
         console.error(error);
+        setMovies([]);
+        setError('映画データの取得に失敗しました。');
       } finally {
         // loading を false に戻す処理
         // finallyで成功・失敗に関係なく通信が終わったら解除する
@@ -179,6 +184,7 @@ function App() {
         ❤&nbsp;お気に入り一覧
       </a>
 
+      {error && <p className="error-message">{error}</p>}
       <div id="movieList" className="grid">
         {loading
           ? Array.from({ length: 6 }).map((_, index) => <div key={index} className="skeleton skeleton-card"></div>)
