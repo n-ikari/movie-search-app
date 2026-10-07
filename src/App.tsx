@@ -37,11 +37,13 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   // 選択したジャンルをReactに管理させる
   const [genre, setGenre] = useState('');
+  // 選択した並び順をReactに管理させる
+  const [sort, setSort] = useState('popularity.desc');
 
   useEffect(() => {
     async function loadMovies() {
       try {
-        const data = await fetchMovies(searchQuery, genre);
+        const data = await fetchMovies(searchQuery, genre, sort);
         const formattedMovies = data.results.map(formatMovie);
 
         setMovies(formattedMovies);
@@ -51,8 +53,8 @@ function App() {
     }
 
     loadMovies();
-    // 初回表示時 ＋ searchQuery または genre が変わる→ useEffectが動く→ fetchMovies(searchQuery, genre)実行
-  }, [searchQuery, genre]);
+    // 初回表示時 ＋ searchQuery、genre、sort が変わる → useEffectが動く → fetchMovies(searchQuery, genre, sort)実行
+  }, [searchQuery, genre, sort]);
   // Enterで検索できるように
   // 映画名検索 → ジャンルを解除
   // ジャンル選択 → 映画名検索を解除＋検索欄も空にする
@@ -84,7 +86,7 @@ function App() {
             ))}
           </select>
 
-          <select id="sortSelect">
+          <select id="sortSelect" value={sort} onChange={e => setSort(e.target.value)}>
             <option value="popularity.desc">人気順</option>
             <option value="vote_average.desc">評価順</option>
             <option value="primary_release_date.desc">公開日順</option>
