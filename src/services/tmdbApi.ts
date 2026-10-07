@@ -14,7 +14,8 @@ export async function fetchMovies(
   query = '',
   genre = '',
   sort = 'popularity.desc',
-  nowPlaying = false
+  nowPlaying = false,
+  page = 1
 ): Promise<TmdbMovieResponse> {
   let releaseDateParams = '';
 
@@ -34,12 +35,12 @@ export async function fetchMovies(
     ? `${BASE_URL}/search/movie` +
       `?api_key=${API_KEY}` +
       `&language=ja-JP` +
-      `&page=1` +
+      `&page=${page}` +
       `&query=${encodeURIComponent(query)}`
     : `${BASE_URL}/discover/movie` +
       `?api_key=${API_KEY}` +
       `&language=ja-JP` +
-      `&page=1` +
+      `&page=${page}` +
       `&sort_by=${sort}` +
       // ジャンル指定がある場合のみ絞り込み条件を追加
       // /discover/movie に日付条件を追加

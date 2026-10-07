@@ -42,21 +42,31 @@ function App() {
   // 「最近1ヶ月」のチェック状態をReactに管理させる
   const [nowPlaying, setNowPlaying] = useState(false);
 
+  // 現在のページ番号をReactに管理させる
+  const [page, setPage] = useState(1);
+  // APIから返された総ページ数をReactに管理させる
+  const [totalPages, setTotalPages] = useState(1);
+  // APIから返された映画の総件数をReactに管理させる
+  const [totalResults, setTotalResults] = useState(0);
+
   useEffect(() => {
     async function loadMovies() {
       try {
-        const data = await fetchMovies(searchQuery, genre, sort, nowPlaying);
+        const data = await fetchMovies(searchQuery, genre, sort, nowPlaying, page);
         const formattedMovies = data.results.map(formatMovie);
 
         setMovies(formattedMovies);
+        // ページネーション
+        setTotalPages(data.total_pages);
+        setTotalResults(data.total_results);
       } catch (error) {
         console.error(error);
       }
     }
 
     loadMovies();
-    // 初回表示時 ＋ searchQuery、genre、sort、nowPlaying が変わる → useEffectが動く → fetchMovies()実行
-  }, [searchQuery, genre, sort, nowPlaying]);
+    // 初回表示時 ＋ searchQuery、genre、sort、nowPlaying 、pageが変わる → useEffectが動く → fetchMovies()実行
+  }, [searchQuery, genre, sort, nowPlaying, page]);
   // Enterで検索できるように
   // 映画名検索 → ジャンルを解除
   // ジャンル選択 → 映画名検索を解除＋検索欄も空にする
@@ -64,12 +74,14 @@ function App() {
     e.preventDefault();
     setSearchQuery(query);
     setGenre('');
+    setPage(1);
   }
 
   function handleGenreChange(e: ChangeEvent<HTMLSelectElement>) {
     setGenre(e.target.value);
     setSearchQuery('');
     setQuery('');
+    setPage(1);
   }
 
   return (
@@ -88,7 +100,13 @@ function App() {
             ))}
           </select>
 
-          <select id="sortSelect" value={sort} onChange={e => setSort(e.target.value)}>
+          <select
+            id="sortSelect"
+            value={sort}
+            onChange={e => {
+              setSort(e.target.value);
+              setPage(1);
+            }}>
             <option value="popularity.desc">人気順</option>
             <option value="vote_average.desc">評価順</option>
             <option value="primary_release_date.desc">公開日順</option>
@@ -99,7 +117,10 @@ function App() {
               type="checkbox"
               id="nowPlayingCheck"
               checked={nowPlaying}
-              onChange={e => setNowPlaying(e.target.checked)}
+              onChange={e => {
+                setNowPlaying(e.target.checked);
+                setPage(1);
+              }}
             />
             最近1ヶ月
           </label>
@@ -132,15 +153,17 @@ function App() {
       </div>
 
       <div className="pageNav">
-        <button type="button" id="prevBtn">
+        <button type="button" id="prevBtn" disabled={page === 1} onClick={() => setPage(page - 1)}>
           前へ
         </button>
 
-        <button type="button" id="nextBtn">
+        <button type="button" id="nextBtn" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
           次へ
         </button>
 
-        <span id="pageInfo"></span>
+        <span id="pageInfo">
+          {(page - 1) * 20 + 1}-{Math.min(page * 20, totalResults)}件 / {totalResults}件
+        </span>
       </div>
     </main>
   );
