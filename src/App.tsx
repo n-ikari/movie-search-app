@@ -29,6 +29,12 @@ const genreMap = {
   37: '西部劇',
 };
 
+const sortMap = {
+  'popularity.desc': '人気順',
+  'vote_average.desc': '評価順',
+  'primary_release_date.desc': '公開日順',
+};
+
 function App() {
   // moviesという状態を作る。中身はMovie型の配列。初期値は空配列。更新するときはsetMoviesを使う
   // 「映画一覧 movies をReactに管理してもらう。変更するときは setMovies()」
@@ -82,6 +88,25 @@ function App() {
     setSearchQuery('');
     setQuery('');
     setPage(1);
+  }
+
+  // 現在の状態
+  let currentStateText = '';
+
+  if (searchQuery) {
+    currentStateText += `検索: ${searchQuery} `;
+  }
+
+  if (genre) {
+    currentStateText += `ジャンル: ${genreMap[Number(genre) as keyof typeof genreMap]} `;
+  }
+
+  if (nowPlaying) {
+    currentStateText += '現在公開中 ';
+  }
+
+  if (!searchQuery) {
+    currentStateText += `並び: ${sortMap[sort as keyof typeof sortMap]}`;
   }
 
   return (
@@ -140,7 +165,7 @@ function App() {
         </form>
       </div>
 
-      <div id="currentState"></div>
+      <div id="currentState">{currentStateText || 'すべての映画'}</div>
 
       <a className="pageLink" href="#">
         ❤&nbsp;お気に入り一覧
