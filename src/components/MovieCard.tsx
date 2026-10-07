@@ -1,36 +1,22 @@
-import type { Movie } from '../types/movie'
+import type { Movie } from '../types/movie';
 
 type MovieCardProps = {
-  movie: Movie
-  isFavorite?: boolean
+  movie: Movie;
+  isFavorite?: boolean;
 
-// MovieCardには movie を必ず渡してください。
-// その movie は Movie 型でなければいけません。
-// isFavorite は省略可能ですが、渡すならbooleanです。
-}
+  // MovieCardには movie を必ず渡してください。
+  // その movie は Movie 型でなければいけません。
+  // isFavorite は省略可能ですが、渡すならbooleanです。
+};
 
-
-function MovieCard({
-  movie,
-  isFavorite = false,
-}: MovieCardProps) {
+function MovieCard({ movie, isFavorite = false }: MovieCardProps) {
   return (
-    <div className="card" data-id={movie.id}>
-      <button
-        type="button"
-        className={`favBtn ${isFavorite ? 'active' : ''}`}
-        aria-label="お気に入り"
-      >
+    <div className="card fadeIn" data-id={movie.id}>
+      <button type="button" className={`favBtn ${isFavorite ? 'active' : ''}`} aria-label="お気に入り">
         ❤
       </button>
 
-      <div className="cardInner">
-        {movie.img ? (
-          <img src={movie.img} alt={movie.title} />
-        ) : (
-          <p>画像なし</p>
-        )}
-      </div>
+      <div className="cardInner">{movie.img ? <img src={movie.img} alt={movie.title} /> : <p>画像なし</p>}</div>
 
       <div className="cardInner">
         <h3 className="movieTitle">{movie.title}</h3>
@@ -38,10 +24,7 @@ function MovieCard({
         <p>🌎全世界公開日 {movie.date}</p>
 
         <p className="score">
-          評価⭐{' '}
-          <span className={movie.scoreClass}>
-            {movie.score}
-          </span>
+          評価⭐ <span className={movie.scoreClass}>{movie.score}</span>
         </p>
 
         <div className="overview">
@@ -49,7 +32,7 @@ function MovieCard({
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default MovieCard
+export default MovieCard;

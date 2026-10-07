@@ -209,3 +209,20 @@
   height: 300px;
   margin-bottom: 16px;
 }
+
+/* 映画カードのフェードイン */
+.fadeIn {
+  animation: cardFadeIn 0.6s ease forwards;
+}
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
