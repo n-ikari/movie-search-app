@@ -6,16 +6,24 @@ type MovieCardProps = {
   isFavorite?: boolean;
   isRemoving?: boolean;
   onToggleFavorite: (movie: Movie) => void;
+  onOpenModal?: (movie: Movie) => void;
 
   // MovieCardには movie を必ず渡してください。
   // その movie は Movie 型でなければいけません。
   // isFavorite は省略可能ですが、渡すならbooleanです。
 };
 
-function MovieCard({ movie, isFavorite = false, isRemoving = false, onToggleFavorite }: MovieCardProps) {
+function MovieCard({ movie, isFavorite = false, isRemoving = false, onToggleFavorite, onOpenModal }: MovieCardProps) {
   const [isPopping, setIsPopping] = useState(false);
   return (
-    <div className={`card ${isRemoving ? 'fadeOut' : 'fadeIn'}`} data-id={movie.id}>
+    <div
+      className={`card ${isRemoving ? 'fadeOut' : 'fadeIn'}`}
+      data-id={movie.id}
+      onClick={() => {
+        if (!isRemoving) {
+          onOpenModal?.(movie);
+        }
+      }}>
       <button
         type="button"
         className={`favBtn ${isFavorite ? 'active' : ''} ${isPopping ? 'pop' : ''}`}

@@ -6,6 +6,7 @@ import { formatMovie } from './utils/formatMovie';
 import type { Movie } from './types/movie';
 import { loadFavorites, saveFavorites } from './utils/favoritesStore';
 import FavoritesPage from './components/FavoritesPage';
+import MovieModal from './components/MovieModal';
 import './App.css';
 
 // 選択肢（ジャンル）をReactで表示する。固定データ。
@@ -38,6 +39,8 @@ const sortMap = {
 };
 
 function App() {
+  // モーダルで表示する映画を管理する
+  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   // 現在表示している画面を管理する
   const [currentView, setCurrentView] = useState<'search' | 'favorites'>('search');
   // moviesという状態を作る。中身はMovie型の配列。初期値は空配列。更新するときはsetMoviesを使う
@@ -45,6 +48,8 @@ function App() {
   const [movies, setMovies] = useState<Movie[]>([]);
   // お気に入りをlocalStorageから読み込んで管理する
   const [favorites, setFavorites] = useState<Movie[]>(loadFavorites);
+  // お気に入り一覧で削除アニメーション中の映画ID
+  const [removingFavoriteIds, setRemovingFavoriteIds] = useState<number[]>([]);
   // トースト用
   const [toast, setToast] = useState<{
     message: string;
@@ -194,12 +199,31 @@ function App() {
     }, 2500);
   }
 
+  // お気に入り一覧から削除するときのアニメーション処理
+  function removeFavoriteWithAnimation(movie: Movie) {
+    // 二重削除を防ぐ
+    if (removingFavoriteIds.includes(movie.id)) return;
+
+    // フェードアウトを開始
+    setRemovingFavoriteIds(prev => [...prev, movie.id]);
+
+    // 300ms後にお気に入りから削除
+    setTimeout(() => {
+      toggleFavorite(movie);
+
+      // 削除中のIDを解除
+      setRemovingFavoriteIds(prev => prev.filter(id => id !== movie.id));
+    }, 300);
+  }
+
   return (
     <main className="container">
       {currentView === 'favorites' ? (
         <FavoritesPage
           favorites={favorites}
-          onToggleFavorite={toggleFavorite}
+          removingIds={removingFavoriteIds}
+          onRemoveFavorite={removeFavoriteWithAnimation}
+          onOpenModal={setSelectedMovie}
           onBack={() => {
             setCurrentView('search');
             scrollTop();
@@ -296,6 +320,7 @@ function App() {
                   movie={movie}
                   isFavorite={favorites.some(favorite => favorite.id === movie.id)}
                   onToggleFavorite={toggleFavorite}
+                  onOpenModal={setSelectedMovie}
                 />
               ))
             )}
@@ -330,7 +355,16 @@ function App() {
           </div>
         </>
       )}
-
+      {/* モーダル */}
+      {selectedMovie && (
+        <MovieModal
+          movie={selectedMovie}
+          isFavorite={favorites.some(favorite => favorite.id === selectedMovie.id)}
+          onToggleFavorite={currentView === 'favorites' ? removeFavoriteWithAnimation : toggleFavorite}
+          onClose={() => setSelectedMovie(null)}
+        />
+      )}
+      {/* トースト */}
       {toast && <div className={`toast ${toast.type} ${toast.isLeaving ? 'hide' : 'show'}`}>{toast.message}</div>}
     </main>
   );
