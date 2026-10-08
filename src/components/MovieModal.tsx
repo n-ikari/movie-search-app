@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { fetchMovieDetail, fetchJapanReleaseDate, fetchMovieTrailer, fetchEnglishOverview } from '../services/tmdbApi';
 import type { Movie } from '../types/movie';
 
@@ -10,6 +10,9 @@ type MovieModalProps = {
 };
 
 function MovieModal({ movie, isFavorite, onToggleFavorite, onClose }: MovieModalProps) {
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const modalContentRef = useRef<HTMLDivElement>(null);
+
   const [isClosing, setIsClosing] = useState(false);
   // ハートのアニメーション用
   const [isPopping, setIsPopping] = useState(false);
@@ -31,6 +34,21 @@ function MovieModal({ movie, isFavorite, onToggleFavorite, onClose }: MovieModal
     setIsClosing(true);
   }
 
+  // モーダルを開いたら閉じるボタンにフォーカスし、閉じたら元に戻す
+
+  // モーダルを開いたら閉じるボタンにフォーカスし、閉じたら元に戻す
+  useEffect(() => {
+    const previousActiveElement = document.activeElement;
+
+    closeButtonRef.current?.focus();
+
+    return () => {
+      if (previousActiveElement instanceof HTMLElement && previousActiveElement.isConnected) {
+        previousActiveElement.focus();
+      }
+    };
+  }, []);
+
   // ① 背景スクロールの固定・復元
   useEffect(() => {
     const originalOverflow = document.body.style.overflow;
@@ -50,11 +68,47 @@ function MovieModal({ movie, isFavorite, onToggleFavorite, onClose }: MovieModal
     };
   }, []);
 
-  // ② Escキーで閉じる
+  // ② Escキーで閉じる・Tabキーをモーダル内に制限する
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') {
+        event.preventDefault();
         setIsClosing(true);
+        return;
+      }
+
+      if (event.key !== 'Tab') return;
+
+      const modalContent = modalContentRef.current;
+      if (!modalContent) return;
+
+      const focusableElements = Array.from(
+        modalContent.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )
+      ).filter(element => element.getClientRects().length > 0);
+
+      if (focusableElements.length === 0) {
+        event.preventDefault();
+        modalContent.focus();
+        return;
+      }
+
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+
+      if (event.shiftKey) {
+        // Shift + Tab：最初の要素から最後の要素へ
+        if (document.activeElement === firstElement || !modalContent.contains(document.activeElement)) {
+          event.preventDefault();
+          lastElement.focus();
+        }
+      } else {
+        // Tab：最後の要素から最初の要素へ
+        if (document.activeElement === lastElement || !modalContent.contains(document.activeElement)) {
+          event.preventDefault();
+          firstElement.focus();
+        }
       }
     }
 
@@ -216,9 +270,15 @@ function MovieModal({ movie, isFavorite, onToggleFavorite, onClose }: MovieModal
           handleClose();
         }
       }}>
-      <div className="modal-content" role="dialog" aria-modal="true" aria-label={movie.title}>
+      <div
+        ref={modalContentRef}
+        className="modal-content"
+        role="dialog"
+        aria-modal="true"
+        aria-label={movie.title}
+        tabIndex={-1}>
         <div className="modalActions">
-          <button type="button" id="modalClose" onClick={handleClose}>
+          <button ref={closeButtonRef} type="button" id="modalClose" aria-label="閉じる" onClick={handleClose}>
             ✕
           </button>
 

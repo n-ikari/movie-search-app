@@ -19,9 +19,22 @@ function MovieCard({ movie, isFavorite = false, isRemoving = false, onToggleFavo
     <div
       className={`card ${isRemoving ? 'fadeOut' : 'fadeIn'}`}
       data-id={movie.id}
+      role="button"
+      tabIndex={isRemoving || !onOpenModal ? -1 : 0}
+      aria-label={`${movie.title}の詳細を表示`}
+      aria-disabled={isRemoving}
       onClick={() => {
         if (!isRemoving) {
           onOpenModal?.(movie);
+        }
+      }}
+      onKeyDown={event => {
+        if (event.target !== event.currentTarget) return;
+        if (isRemoving || !onOpenModal) return;
+
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onOpenModal(movie);
         }
       }}>
       <button
