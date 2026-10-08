@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import MovieCard from './components/MovieCard';
 import { fetchMovies } from './services/tmdbApi';
 import { formatMovie } from './utils/formatMovie';
 import type { Movie } from './types/movie';
 import { loadFavorites, saveFavorites } from './utils/favoritesStore';
+import FavoritesPage from './components/FavoritesPage';
 import './App.css';
 
 // 選択肢（ジャンル）をReactで表示する。固定データ。
@@ -37,6 +38,8 @@ const sortMap = {
 };
 
 function App() {
+  // 現在表示している画面を管理する
+  const [currentView, setCurrentView] = useState<'search' | 'favorites'>('search');
   // moviesという状態を作る。中身はMovie型の配列。初期値は空配列。更新するときはsetMoviesを使う
   // 「映画一覧 movies をReactに管理してもらう。変更するときは setMovies()」
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -46,7 +49,11 @@ function App() {
   const [toast, setToast] = useState<{
     message: string;
     type: 'add' | 'remove';
+    isLeaving: boolean;
   } | null>(null);
+  // タイマーを管理するRefを追加
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const toastRemoveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [query, setQuery] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   // 選択したジャンルをReactに管理させる
@@ -94,6 +101,20 @@ function App() {
     loadMovies();
     // 初回表示時 ＋ searchQuery、genre、sort、nowPlaying 、pageが変わる → useEffectが動く → fetchMovies()実行
   }, [searchQuery, genre, sort, nowPlaying, page]);
+
+  // アンマウント時のタイマー解除
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current !== null) {
+        clearTimeout(toastTimerRef.current);
+      }
+
+      if (toastRemoveTimerRef.current !== null) {
+        clearTimeout(toastRemoveTimerRef.current);
+      }
+    };
+  }, []);
+
   // Enterで検索できるように
   // 映画名検索 → ジャンルを解除
   // ジャンル選択 → 映画名検索を解除＋検索欄も空にする
@@ -146,123 +167,171 @@ function App() {
     saveFavorites(newFavorites);
 
     setToast({
-      message: exists ? 'お気に入りから削除しました' : 'お気に入りに追加しました',
+      message: exists
+        ? `「${movie.title}」をお気に入りから削除しました。`
+        : `「${movie.title}」をお気に入りに追加しました。`,
       type: exists ? 'remove' : 'add',
+      isLeaving: false,
     });
 
-    setTimeout(() => {
-      setToast(null);
+    // 前回のトースト用タイマーを解除
+    if (toastTimerRef.current !== null) {
+      clearTimeout(toastTimerRef.current);
+    }
+
+    if (toastRemoveTimerRef.current !== null) {
+      clearTimeout(toastRemoveTimerRef.current);
+    }
+
+    // 2秒後にフェードアウト開始
+    toastTimerRef.current = setTimeout(() => {
+      setToast(prev => (prev ? { ...prev, isLeaving: true } : null));
     }, 2000);
+
+    // 2.5秒後にトーストを削除
+    toastRemoveTimerRef.current = setTimeout(() => {
+      setToast(null);
+    }, 2500);
   }
 
   return (
     <main className="container">
-      <h1>映画検索</h1>
+      {currentView === 'favorites' ? (
+        <FavoritesPage
+          favorites={favorites}
+          onToggleFavorite={toggleFavorite}
+          onBack={() => {
+            setCurrentView('search');
+            scrollTop();
+          }}
+        />
+      ) : (
+        <>
+          <h1>映画検索</h1>
 
-      <div className="l-serchWrap">
-        <div className="l-sortArea">
-          <select id="genreFilter" value={genre} onChange={handleGenreChange}>
-            <option value="">すべて</option>
+          <div className="l-serchWrap">
+            <div className="l-sortArea">
+              <select id="genreFilter" value={genre} onChange={handleGenreChange}>
+                <option value="">すべて</option>
 
-            {Object.entries(genreMap).map(([id, name]) => (
-              <option key={id} value={id}>
-                {name}
-              </option>
-            ))}
-          </select>
+                {Object.entries(genreMap).map(([id, name]) => (
+                  <option key={id} value={id}>
+                    {name}
+                  </option>
+                ))}
+              </select>
 
-          <select
-            id="sortSelect"
-            value={sort}
-            onChange={e => {
-              setSort(e.target.value);
-              setPage(1);
+              <select
+                id="sortSelect"
+                value={sort}
+                onChange={e => {
+                  setSort(e.target.value);
+                  setPage(1);
+                }}>
+                <option value="popularity.desc">人気順</option>
+                <option value="vote_average.desc">評価順</option>
+                <option value="primary_release_date.desc">公開日順</option>
+              </select>
+
+              <label>
+                <input
+                  type="checkbox"
+                  id="nowPlayingCheck"
+                  checked={nowPlaying}
+                  onChange={e => {
+                    setNowPlaying(e.target.checked);
+                    setPage(1);
+                  }}
+                />
+                最近1ヶ月
+              </label>
+            </div>
+
+            <form className="l-serchArea" onSubmit={handleSearch}>
+              <input
+                type="text"
+                id="searchInput"
+                placeholder="映画名で検索"
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+              />
+              <button type="submit" id="searchBtn">
+                検索
+              </button>
+            </form>
+          </div>
+
+          <div id="currentState">{currentStateText || 'すべての映画'}</div>
+
+          <button
+            type="button"
+            className="pageLink"
+            onClick={() => {
+              setCurrentView('favorites');
+              scrollTop();
             }}>
-            <option value="popularity.desc">人気順</option>
-            <option value="vote_average.desc">評価順</option>
-            <option value="primary_release_date.desc">公開日順</option>
-          </select>
-
-          <label>
-            <input
-              type="checkbox"
-              id="nowPlayingCheck"
-              checked={nowPlaying}
-              onChange={e => {
-                setNowPlaying(e.target.checked);
-                setPage(1);
-              }}
-            />
-            最近1ヶ月
-          </label>
-        </div>
-
-        <form className="l-serchArea" onSubmit={handleSearch}>
-          <input
-            type="text"
-            id="searchInput"
-            placeholder="映画名で検索"
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-          />
-          <button type="submit" id="searchBtn">
-            検索
+            ❤&nbsp;お気に入り一覧
           </button>
-        </form>
-      </div>
 
-      <div id="currentState">{currentStateText || 'すべての映画'}</div>
+          <button
+            type="button"
+            className="backToSearchFixed"
+            onClick={() => {
+              setCurrentView('favorites');
+              scrollTop();
+            }}>
+            ❤ 一覧へ
+          </button>
 
-      <a className="pageLink" href="#">
-        ❤&nbsp;お気に入り一覧
-      </a>
+          {error && <p className="error-message">{error}</p>}
+          <div id="movieList" className="grid">
+            {loading ? (
+              Array.from({ length: 6 }).map((_, index) => <div key={index} className="skeleton skeleton-card"></div>)
+            ) : !error && movies.length === 0 ? (
+              <p>データがありません</p>
+            ) : (
+              movies.map(movie => (
+                <MovieCard
+                  key={movie.id}
+                  movie={movie}
+                  isFavorite={favorites.some(favorite => favorite.id === movie.id)}
+                  onToggleFavorite={toggleFavorite}
+                />
+              ))
+            )}
+          </div>
 
-      {error && <p className="error-message">{error}</p>}
-      <div id="movieList" className="grid">
-        {loading ? (
-          Array.from({ length: 6 }).map((_, index) => <div key={index} className="skeleton skeleton-card"></div>)
-        ) : !error && movies.length === 0 ? (
-          <p>データがありません</p>
-        ) : (
-          movies.map(movie => (
-            <MovieCard
-              key={movie.id}
-              movie={movie}
-              isFavorite={favorites.some(favorite => favorite.id === movie.id)}
-              onToggleFavorite={toggleFavorite}
-            />
-          ))
-        )}
-      </div>
+          <div className="pageNav">
+            <button
+              type="button"
+              id="prevBtn"
+              disabled={page === 1}
+              onClick={() => {
+                setPage(page - 1);
+                scrollTop();
+              }}>
+              前へ
+            </button>
 
-      <div className="pageNav">
-        <button
-          type="button"
-          id="prevBtn"
-          disabled={page === 1}
-          onClick={() => {
-            setPage(page - 1);
-            scrollTop();
-          }}>
-          前へ
-        </button>
+            <button
+              type="button"
+              id="nextBtn"
+              disabled={page >= totalPages}
+              onClick={() => {
+                setPage(page + 1);
+                scrollTop();
+              }}>
+              次へ
+            </button>
 
-        <button
-          type="button"
-          id="nextBtn"
-          disabled={page >= totalPages}
-          onClick={() => {
-            setPage(page + 1);
-            scrollTop();
-          }}>
-          次へ
-        </button>
+            <span id="pageInfo">
+              {(page - 1) * 20 + 1}-{Math.min(page * 20, totalResults)}件 / {totalResults}件
+            </span>
+          </div>
+        </>
+      )}
 
-        <span id="pageInfo">
-          {(page - 1) * 20 + 1}-{Math.min(page * 20, totalResults)}件 / {totalResults}件
-        </span>
-      </div>
-      {toast && <div className={`toast ${toast.type} show`}>{toast.message}</div>}
+      {toast && <div className={`toast ${toast.type} ${toast.isLeaving ? 'hide' : 'show'}`}>{toast.message}</div>}
     </main>
   );
 }
