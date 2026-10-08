@@ -80,31 +80,43 @@ function App() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    let cancelled = false;
+
     async function loadMovies() {
       try {
         setLoading(true);
-        setError(''); // 前回のエラーを消す
+        setError('');
 
         const data = await fetchMovies(searchQuery, genre, sort, nowPlaying, page);
+
+        // 古いリクエストの結果なら画面を更新しない
+        if (cancelled) return;
+
         const formattedMovies = data.results.map(formatMovie);
 
         setMovies(formattedMovies);
-        // ページネーション
         setTotalPages(data.total_pages);
         setTotalResults(data.total_results);
       } catch (error) {
+        // 古いリクエストのエラーは表示しない
+        if (cancelled) return;
+
         console.error(error);
         setMovies([]);
         setError('映画データの取得に失敗しました。');
       } finally {
-        // loading を false に戻す処理
-        // finallyで成功・失敗に関係なく通信が終わったら解除する
-        setLoading(false);
+        // 古いリクエストの終了で現在のローディングを解除しない
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
 
     loadMovies();
-    // 初回表示時 ＋ searchQuery、genre、sort、nowPlaying 、pageが変わる → useEffectが動く → fetchMovies()実行
+
+    return () => {
+      cancelled = true;
+    };
   }, [searchQuery, genre, sort, nowPlaying, page]);
 
   // アンマウント時のタイマー解除
