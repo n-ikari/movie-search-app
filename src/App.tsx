@@ -362,7 +362,9 @@ function App() {
             </button>
 
             <span id="pageInfo">
-              {(page - 1) * 20 + 1}-{Math.min(page * 20, totalResults)}件 / {totalResults}件
+              {totalResults === 0
+                ? '0件 / 0件'
+                : `${(page - 1) * 20 + 1}-${Math.min(page * 20, totalResults)}件 / ${totalResults}件`}
             </span>
           </div>
         </>
