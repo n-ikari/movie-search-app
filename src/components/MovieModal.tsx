@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchMovieDetail, fetchJapanReleaseDate, fetchMovieTrailer } from '../services/tmdbApi';
+import { fetchMovieDetail, fetchJapanReleaseDate, fetchMovieTrailer, fetchEnglishOverview } from '../services/tmdbApi';
 import type { Movie } from '../types/movie';
 
 type MovieModalProps = {
@@ -17,6 +17,9 @@ function MovieModal({ movie, isFavorite, onToggleFavorite, onClose }: MovieModal
   const [detail, setDetail] = useState<Awaited<ReturnType<typeof fetchMovieDetail>> | null>(null);
   const [detailLoading, setDetailLoading] = useState(true);
   const [detailError, setDetailError] = useState('');
+  // 日本語の概要がない場合に使用する英語版の概要
+  const [englishOverview, setEnglishOverview] = useState('');
+  const [englishOverviewLoading, setEnglishOverviewLoading] = useState(false);
   const [japanReleaseDate, setJapanReleaseDate] = useState('読み込み中...');
   // YouTube動画
   const [trailerKey, setTrailerKey] = useState<string | null>(null);
@@ -163,6 +166,47 @@ function MovieModal({ movie, isFavorite, onToggleFavorite, onClose }: MovieModal
     };
   }, [movie.id]);
 
+  // 英語版概要を取得する
+
+  useEffect(() => {
+    // 日本語の詳細取得が終わるまで待つ
+    if (detailLoading || detailError) return;
+
+    // 日本語の概要があれば英語版は取得しない
+    if (detail?.overview?.trim()) return;
+
+    // 一覧取得時の概要があれば英語版は取得しない
+    if (movie.overview && movie.overview !== '概要なし') return;
+
+    let cancelled = false;
+
+    async function loadEnglishOverview() {
+      try {
+        setEnglishOverviewLoading(true);
+
+        const overview = await fetchEnglishOverview(movie.id);
+
+        if (!cancelled) {
+          setEnglishOverview(overview);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error('英語版概要の取得に失敗しました:', error);
+        }
+      } finally {
+        if (!cancelled) {
+          setEnglishOverviewLoading(false);
+        }
+      }
+    }
+
+    loadEnglishOverview();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [movie.id, movie.overview, detail?.overview, detailLoading, detailError]);
+
   return (
     // ここから下は既存のJSXをそのまま使用
     <div
@@ -223,7 +267,12 @@ function MovieModal({ movie, isFavorite, onToggleFavorite, onClose }: MovieModal
                 <p>{movie.overview}</p>
               </>
             ) : (
-              <p>{detail?.overview?.trim() || movie.overview || '概要なし'}</p>
+              <p>
+                {detail?.overview?.trim() ||
+                  (movie.overview !== '概要なし' ? movie.overview : '') ||
+                  englishOverview ||
+                  (englishOverviewLoading ? '英語版の概要を読み込み中...' : '概要なし')}
+              </p>
             )}
           </div>
         </div>

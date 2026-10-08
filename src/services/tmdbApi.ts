@@ -231,3 +231,41 @@ export async function fetchMovieTrailer(movieId: number): Promise<string | null>
     throw error;
   }
 }
+
+/**
+ * 日本語の概要がない場合に使用する英語版の概要を取得する。
+ * 同じ映画への重複通信を防ぐため、Promiseをキャッシュする。
+ */
+const englishOverviewCache = new Map<number, Promise<string>>();
+
+export async function fetchEnglishOverview(movieId: number): Promise<string> {
+  const cached = englishOverviewCache.get(movieId);
+
+  if (cached) {
+    return cached;
+  }
+
+  const request = (async () => {
+    const response = await fetch(
+      `${BASE_URL}/movie/${movieId}?api_key=${API_KEY}&language=en-US`
+    );
+
+    if (!response.ok) {
+      throw new Error(`英語版概要の取得に失敗しました: ${response.status}`);
+    }
+
+    const data: TmdbMovieDetail = await response.json();
+
+    return data.overview?.trim() || '';
+  })();
+
+  englishOverviewCache.set(movieId, request);
+
+  try {
+    return await request;
+  } catch (error) {
+    englishOverviewCache.delete(movieId);
+    throw error;
+  }
+}
+
