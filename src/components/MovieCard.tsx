@@ -4,6 +4,7 @@ import type { Movie } from '../types/movie';
 type MovieCardProps = {
   movie: Movie;
   isFavorite?: boolean;
+  isRemoving?: boolean;
   onToggleFavorite: (movie: Movie) => void;
 
   // MovieCardには movie を必ず渡してください。
@@ -11,10 +12,10 @@ type MovieCardProps = {
   // isFavorite は省略可能ですが、渡すならbooleanです。
 };
 
-function MovieCard({ movie, isFavorite = false, onToggleFavorite }: MovieCardProps) {
+function MovieCard({ movie, isFavorite = false, isRemoving = false, onToggleFavorite }: MovieCardProps) {
   const [isPopping, setIsPopping] = useState(false);
   return (
-    <div className="card fadeIn" data-id={movie.id}>
+    <div className={`card ${isRemoving ? 'fadeOut' : 'fadeIn'}`} data-id={movie.id}>
       <button
         type="button"
         className={`favBtn ${isFavorite ? 'active' : ''} ${isPopping ? 'pop' : ''}`}

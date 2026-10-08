@@ -364,3 +364,21 @@
     font-size: 13px;
   }
 }
+
+/* お気に入り削除時のフェードアウト */
+.fadeOut {
+  animation: cardFadeOut 0.3s ease forwards;
+  pointer-events: none;
+}
+
+@keyframes cardFadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}

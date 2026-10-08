@@ -12,6 +12,8 @@ const PER_PAGE = 6;
 
 function FavoritesPage({ favorites, onToggleFavorite, onBack }: FavoritesPageProps) {
   const [page, setPage] = useState(1);
+  // 削除中の映画IDを管理
+  const [removingIds, setRemovingIds] = useState<number[]>([]);
 
   // お気に入りの総ページ数
   const totalPages = Math.ceil(favorites.length / PER_PAGE);
@@ -27,6 +29,18 @@ function FavoritesPage({ favorites, onToggleFavorite, onBack }: FavoritesPagePro
     setPage(newPage);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+  // 削除用の関数を追加
+  function handleRemoveFavorite(movie: Movie) {
+    // 連続クリックによる二重削除を防ぐ
+    if (removingIds.includes(movie.id)) return;
+
+    setRemovingIds(prev => [...prev, movie.id]);
+
+    setTimeout(() => {
+      onToggleFavorite(movie);
+      setRemovingIds(prev => prev.filter(id => id !== movie.id));
+    }, 300);
+  }
 
   return (
     <>
@@ -41,7 +55,13 @@ function FavoritesPage({ favorites, onToggleFavorite, onBack }: FavoritesPagePro
           <p>お気に入りがありません</p>
         ) : (
           pagedMovies.map(movie => (
-            <MovieCard key={movie.id} movie={movie} isFavorite={true} onToggleFavorite={onToggleFavorite} />
+            <MovieCard
+              key={movie.id}
+              movie={movie}
+              isFavorite={true}
+              isRemoving={removingIds.includes(movie.id)}
+              onToggleFavorite={handleRemoveFavorite}
+            />
           ))
         )}
       </div>
