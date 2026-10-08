@@ -48,6 +48,13 @@ function App() {
   const [movies, setMovies] = useState<Movie[]>([]);
   // お気に入りをlocalStorageから読み込んで管理する
   const [favorites, setFavorites] = useState<Movie[]>(loadFavorites);
+  const favoritesRef = useRef(favorites);
+
+  // favorites の変更を localStorage に自動保存する
+  useEffect(() => {
+    saveFavorites(favorites);
+  }, [favorites]);
+
   // お気に入り一覧で削除アニメーション中の映画ID
   const [removingFavoriteIds, setRemovingFavoriteIds] = useState<number[]>([]);
   // トースト用
@@ -176,18 +183,61 @@ function App() {
   }
   // お気に入り
   function toggleFavorite(movie: Movie) {
-    const exists = favorites.some(favorite => favorite.id === movie.id);
+    const currentFavorites = favoritesRef.current;
+    const exists = currentFavorites.some(favorite => favorite.id === movie.id);
 
-    const newFavorites = exists ? favorites.filter(favorite => favorite.id !== movie.id) : [...favorites, movie];
+    const newFavorites = exists
+      ? currentFavorites.filter(favorite => favorite.id !== movie.id)
+      : [...currentFavorites, movie];
 
+    favoritesRef.current = newFavorites;
     setFavorites(newFavorites);
-    saveFavorites(newFavorites);
 
     setToast({
       message: exists
         ? `「${movie.title}」をお気に入りから削除しました。`
         : `「${movie.title}」をお気に入りに追加しました。`,
       type: exists ? 'remove' : 'add',
+      isLeaving: false,
+    });
+
+    // 前回のトースト用タイマーを解除
+    if (toastTimerRef.current !== null) {
+      clearTimeout(toastTimerRef.current);
+    }
+
+    if (toastRemoveTimerRef.current !== null) {
+      clearTimeout(toastRemoveTimerRef.current);
+    }
+
+    // 2秒後にフェードアウト開始
+    toastTimerRef.current = setTimeout(() => {
+      setToast(prev => (prev ? { ...prev, isLeaving: true } : null));
+    }, 2000);
+
+    // 2.5秒後にトーストを削除
+    toastRemoveTimerRef.current = setTimeout(() => {
+      setToast(null);
+    }, 2500);
+  }
+
+  // お気に入りから削除する専用処理
+  function removeFavorite(movie: Movie) {
+    const currentFavorites = favoritesRef.current;
+
+    // すでに削除済みなら何もしない
+    if (!currentFavorites.some(favorite => favorite.id === movie.id)) {
+      return;
+    }
+
+    const newFavorites = currentFavorites.filter(favorite => favorite.id !== movie.id);
+
+    favoritesRef.current = newFavorites;
+    setFavorites(newFavorites);
+
+    setToast({
+      message: `「${movie.title}」をお気に入りから削除しました。`,
+      type: 'remove',
       isLeaving: false,
     });
 
@@ -221,9 +271,8 @@ function App() {
 
     // 300ms後にお気に入りから削除
     setTimeout(() => {
-      toggleFavorite(movie);
+      removeFavorite(movie);
 
-      // 削除中のIDを解除
       setRemovingFavoriteIds(prev => prev.filter(id => id !== movie.id));
     }, 300);
   }
