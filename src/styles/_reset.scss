@@ -1,0 +1,26 @@
+/* サイズ計算を統一 */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* メディア要素のはみ出し防止 */
+img,
+video,
+iframe {
+  max-width: 100%;
+}
+
+/* 画像下部の余白をなくす */
+img {
+  display: block;
+}
+
+/* フォーム要素のフォントを継承 */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}

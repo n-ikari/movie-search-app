@@ -1,0 +1,62 @@
+/* トースト用 */
+/* お気に入り登録・削除時のToast */
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  box-sizing: border-box;
+  text-align: center;
+  overflow-wrap: anywhere;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* 表示時：下へフェードイン */
+.toast.show {
+  animation: toastSlideIn 0.3s ease-out forwards;
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(20px);
+  }
+}
+
+/* 消える時：上へフェードアウト */
+.toast.hide {
+  animation: toastSlideOut 0.5s ease-in forwards;
+}
+
+@keyframes toastSlideOut {
+  from {
+    opacity: 1;
+    transform: translateX(-50%) translateY(20px);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+}
+
+.toast.add {
+  background: rgba(255, 105, 180, 0.9);
+}
+
+.toast.remove {
+  background: rgba(51, 51, 51, 0.9);
+}

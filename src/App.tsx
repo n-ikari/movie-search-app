@@ -7,7 +7,6 @@ import type { Movie } from './types/movie';
 import { loadFavorites, saveFavorites } from './utils/favoritesStore';
 import FavoritesPage from './components/FavoritesPage';
 import MovieModal from './components/MovieModal';
-import './App.css';
 
 // 選択肢（ジャンル）をReactで表示する。固定データ。
 const genreMap = {
@@ -188,7 +187,7 @@ function App() {
 
     const newFavorites = exists
       ? currentFavorites.filter(favorite => favorite.id !== movie.id)
-      : [...currentFavorites, movie];
+      : [movie, ...currentFavorites];
 
     favoritesRef.current = newFavorites;
     setFavorites(newFavorites);
@@ -423,7 +422,14 @@ function App() {
         <MovieModal
           movie={selectedMovie}
           isFavorite={favorites.some(favorite => favorite.id === selectedMovie.id)}
-          onToggleFavorite={currentView === 'favorites' ? removeFavoriteWithAnimation : toggleFavorite}
+          onToggleFavorite={movie => {
+            if (currentView === 'favorites') {
+              removeFavoriteWithAnimation(movie);
+              setSelectedMovie(null);
+            } else {
+              toggleFavorite(movie);
+            }
+          }}
           onClose={() => setSelectedMovie(null)}
         />
       )}
