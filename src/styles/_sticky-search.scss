@@ -40,3 +40,51 @@
     height: 46px;
   }
 }
+
+.stickySearchPanel {
+  position: fixed;
+  top: 88px;
+  right: 20px;
+  z-index: 899;
+
+  width: min(440px, calc(100vw - 40px));
+  padding: 16px;
+
+  border: 1px solid rgb(139 131 233 / 35%);
+  border-radius: 20px;
+
+  // 半透明のダークブルー
+  background: rgb(36 43 59 / 82%);
+
+  // 背景をぼかす
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  box-shadow: 0 12px 32px rgb(0 0 0 / 35%);
+
+  .l-serchWrap {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+  }
+
+  .l-sortArea {
+    gap: 10px;
+
+    select {
+      flex-basis: 140px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    top: 72px;
+    left: 12px;
+    right: 12px;
+
+    // 左右12pxの余白を確保
+    width: auto;
+    padding: 14px;
+  }
+}

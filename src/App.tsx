@@ -88,7 +88,10 @@ function App() {
   const [error, setError] = useState('');
 
   const searchFormRef = useRef<HTMLDivElement>(null);
+  // 🔍ボタンを表示するか?管理する
   const [showStickySearch, setShowStickySearch] = useState(false);
+  // 検索パネルが開いているか?を管理する
+  const [isSearchPanelOpen, setIsSearchPanelOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -172,6 +175,26 @@ function App() {
     setSearchQuery(query);
     setGenre('');
     setPage(1);
+  }
+
+  function handleStickySearch(e: FormEvent<HTMLFormElement>) {
+    handleSearch(e);
+    setIsSearchPanelOpen(false);
+
+    document.getElementById('movieList')?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  }
+
+  // パネルを閉じる+スクロールの共通処理
+  function closeStickySearchAndScroll() {
+    setIsSearchPanelOpen(false);
+
+    document.getElementById('movieList')?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
   }
 
   function handleGenreChange(e: ChangeEvent<HTMLSelectElement>) {
@@ -340,7 +363,38 @@ function App() {
             />
           </div>
           {/* 表示条件 */}
-          {currentView === 'search' && showStickySearch && !selectedMovie && <StickySearch onClick={() => {}} />}
+          {currentView === 'search' && showStickySearch && !selectedMovie && (
+            <StickySearch onClick={() => setIsSearchPanelOpen(prev => !prev)} />
+          )}
+
+          {showStickySearch && isSearchPanelOpen && !selectedMovie && (
+            <div className="stickySearchPanel">
+              <SearchForm
+                idPrefix="sticky-"
+                query={query}
+                genre={genre}
+                sort={sort}
+                nowPlaying={nowPlaying}
+                genreOptions={genreMap}
+                onQueryChange={setQuery}
+                onGenreChange={event => {
+                  handleGenreChange(event);
+                  closeStickySearchAndScroll();
+                }}
+                onSortChange={value => {
+                  setSort(value);
+                  setPage(1);
+                  closeStickySearchAndScroll();
+                }}
+                onNowPlayingChange={checked => {
+                  setNowPlaying(checked);
+                  setPage(1);
+                  closeStickySearchAndScroll();
+                }}
+                onSearch={handleStickySearch}
+              />
+            </div>
+          )}
 
           <div id="currentState">{currentStateText || 'すべての映画'}</div>
 

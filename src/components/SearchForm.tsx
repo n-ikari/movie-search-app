@@ -11,6 +11,7 @@ type SearchFormProps = {
   onSortChange: (value: string) => void;
   onNowPlayingChange: (checked: boolean) => void;
   onSearch: (event: FormEvent<HTMLFormElement>) => void;
+  idPrefix?: string;
 };
 
 function SearchForm({
@@ -24,25 +25,26 @@ function SearchForm({
   onSortChange,
   onNowPlayingChange,
   onSearch,
+  idPrefix = '',
 }: SearchFormProps) {
   return (
     <div className="l-serchWrap">
       <form className="l-serchArea" onSubmit={onSearch}>
         <input
           type="text"
-          id="searchInput"
+          id={`${idPrefix}searchInput`}
           aria-label="映画名"
           placeholder="映画名で検索"
           value={query}
           onChange={event => onQueryChange(event.target.value)}
         />
 
-        <button type="submit" id="searchBtn">
+        <button type="submit" id={`${idPrefix}searchBtn`}>
           検索
         </button>
       </form>
       <div className="l-sortArea">
-        <select id="genreFilter" aria-label="ジャンル" value={genre} onChange={onGenreChange}>
+        <select id={`${idPrefix}genreFilter`} aria-label="ジャンル" value={genre} onChange={onGenreChange}>
           <option value="">すべて</option>
 
           {Object.entries(genreOptions).map(([id, name]) => (
@@ -52,7 +54,7 @@ function SearchForm({
           ))}
         </select>
 
-        <select id="sortSelect" aria-label="並び順" value={sort} onChange={event => onSortChange(event.target.value)}>
+        <select id={`${idPrefix}sortSelect`} aria-label="並び順" value={sort} onChange={event => onSortChange(event.target.value)}>
           <option value="popularity.desc">人気順</option>
           <option value="vote_average.desc">評価順</option>
           <option value="primary_release_date.desc">公開日順</option>
