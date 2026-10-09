@@ -38,7 +38,7 @@ function FavoritesPage({ favorites, removingIds, onRemoveFavorite, onOpenModal, 
         ← 検索に戻る
       </button>
 
-      <div className="grid">
+      <div className="movieGrid">
         {pagedMovies.length === 0 ? (
           <p>お気に入りがありません</p>
         ) : (

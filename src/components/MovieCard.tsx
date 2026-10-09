@@ -52,20 +52,17 @@ function MovieCard({ movie, isFavorite = false, isRemoving = false, onToggleFavo
         ❤
       </button>
 
-      <div className="cardInner">{movie.img ? <img src={movie.img} alt={movie.title} /> : <p>画像なし</p>}</div>
+      <div className="cardPoster">
+        {movie.img ? <img src={movie.img} alt={movie.title} loading="lazy" /> : <p>画像なし</p>}
+      </div>
 
-      <div className="cardInner">
+      <div className="cardInfo">
         <h3 className="movieTitle">{movie.title}</h3>
 
-        <p>🌎全世界公開日 {movie.date}</p>
-
         <p className="score">
-          評価⭐ <span className={movie.scoreClass}>{movie.score}</span>
+          <span aria-hidden="true">⭐</span>
+          <span className={movie.scoreClass}>{movie.score}</span>
         </p>
-
-        <div className="overview">
-          <p className="inner">{movie.overview}</p>
-        </div>
       </div>
     </div>
   );

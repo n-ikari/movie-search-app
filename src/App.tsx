@@ -368,7 +368,7 @@ function App() {
           </button>
 
           {error && <p className="error-message">{error}</p>}
-          <div id="movieList" className="grid">
+          <div id="movieList" className="movieGrid">
             {loading ? (
               Array.from({ length: 6 }).map((_, index) => <div key={index} className="skeleton skeleton-card"></div>)
             ) : !error && movies.length === 0 ? (
