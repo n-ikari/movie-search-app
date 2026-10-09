@@ -1,0 +1,42 @@
+.stickySearchButton {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 900;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 52px;
+  height: 52px;
+  padding: 0;
+
+  border: 1px solid rgb(255 255 255 / 15%);
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4678d9, #7855c9);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 25%);
+  color: #fff;
+  font-size: 24px;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+
+  &:hover {
+    background: linear-gradient(135deg, #5a8bef, #9068df);
+    transform: translateY(-2px);
+  }
+
+  &:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 3px;
+  }
+
+  @media (max-width: 600px) {
+    top: 12px;
+    right: 12px;
+    width: 46px;
+    height: 46px;
+  }
+}

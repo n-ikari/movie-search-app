@@ -8,6 +8,7 @@ import { loadFavorites, saveFavorites } from './utils/favoritesStore';
 import FavoritesPage from './components/FavoritesPage';
 import MovieModal from './components/MovieModal';
 import SearchForm from './components/SearchForm';
+import StickySearch from './components/StickySearch';
 
 // 選択肢（ジャンル）をReactで表示する。固定データ。
 const genreMap = {
@@ -86,6 +87,9 @@ function App() {
   // APIから映画データを取得できなかった場合のエラーメッセージを管理する
   const [error, setError] = useState('');
 
+  const searchFormRef = useRef<HTMLDivElement>(null);
+  const [showStickySearch, setShowStickySearch] = useState(false);
+
   useEffect(() => {
     let cancelled = false;
 
@@ -138,6 +142,27 @@ function App() {
       }
     };
   }, []);
+
+  // 検索フォームが画面上部に隠れたら追従検索ボタンを表示
+  useEffect(() => {
+    if (currentView !== 'search') return;
+
+    const element = searchFormRef.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setShowStickySearch(entry.boundingClientRect.bottom <= 0);
+      },
+      {
+        threshold: 0,
+      }
+    );
+
+    observer.observe(element);
+
+    return () => observer.disconnect();
+  }, [currentView]);
 
   // Enterで検索できるように
   // 映画名検索 → ジャンルを解除
@@ -294,24 +319,28 @@ function App() {
         <>
           <h1>映画検索</h1>
 
-          <SearchForm
-            query={query}
-            genre={genre}
-            sort={sort}
-            nowPlaying={nowPlaying}
-            genreOptions={genreMap}
-            onQueryChange={setQuery}
-            onGenreChange={handleGenreChange}
-            onSortChange={value => {
-              setSort(value);
-              setPage(1);
-            }}
-            onNowPlayingChange={checked => {
-              setNowPlaying(checked);
-              setPage(1);
-            }}
-            onSearch={handleSearch}
-          />
+          <div ref={searchFormRef}>
+            <SearchForm
+              query={query}
+              genre={genre}
+              sort={sort}
+              nowPlaying={nowPlaying}
+              genreOptions={genreMap}
+              onQueryChange={setQuery}
+              onGenreChange={handleGenreChange}
+              onSortChange={value => {
+                setSort(value);
+                setPage(1);
+              }}
+              onNowPlayingChange={checked => {
+                setNowPlaying(checked);
+                setPage(1);
+              }}
+              onSearch={handleSearch}
+            />
+          </div>
+          {/* 表示条件 */}
+          {currentView === 'search' && showStickySearch && !selectedMovie && <StickySearch onClick={() => {}} />}
 
           <div id="currentState">{currentStateText || 'すべての映画'}</div>
 
