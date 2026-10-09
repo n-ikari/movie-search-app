@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import MovieCard from './components/MovieCard';
-import { fetchMovies } from './services/tmdbApi';
+import { fetchAllSearchMovies, fetchMovies } from './services/tmdbApi';
+import { sortMovies } from './utils/sortMovies';
+import type { MovieSortOrder } from './utils/sortMovies';
 import { formatMovie } from './utils/formatMovie';
-import type { Movie } from './types/movie';
+import type { Movie, TmdbMovie } from './types/movie';
 import { loadFavorites, saveFavorites } from './utils/favoritesStore';
 import FavoritesPage from './components/FavoritesPage';
 import MovieModal from './components/MovieModal';
@@ -48,6 +50,21 @@ function App() {
   // moviesという状態を作る。中身はMovie型の配列。初期値は空配列。更新するときはsetMoviesを使う
   // 「映画一覧 movies をReactに管理してもらう。変更するときは setMovies()」
   const [movies, setMovies] = useState<Movie[]>([]);
+
+  // 映画名検索で取得した全件データを保持する
+  const [allSearchMovies, setAllSearchMovies] = useState<TmdbMovie[] | null>(null);
+
+  // 映画名検索の並び替え可否（nullは検索結果が未確定）
+  const [canSortSearch, setCanSortSearch] = useState<boolean | null>(null);
+  // 検索条件とページ番号に対応する取得済みデータを管理する
+  const searchCacheRef = useRef<{
+    query: string;
+    results: TmdbMovie[];
+    totalPages: number;
+    totalResults: number;
+    canSort: boolean;
+  } | null>(null);
+
   // お気に入りをlocalStorageから読み込んで管理する
   const [favorites, setFavorites] = useState<Movie[]>(loadFavorites);
   const favoritesRef = useRef(favorites);
@@ -102,26 +119,77 @@ function App() {
         setLoading(true);
         setError('');
 
+        if (searchQuery) {
+          const cached = searchCacheRef.current;
+
+          if (cached?.query === searchQuery && cached.canSort) {
+            setAllSearchMovies(cached.results);
+            setCanSortSearch(true);
+            setTotalPages(cached.totalPages);
+            setTotalResults(cached.totalResults);
+            setMovies([]);
+            return;
+          }
+
+          if (cached?.query === searchQuery && !cached.canSort && page > 1) {
+            const data = await fetchMovies(searchQuery, '', sort, nowPlaying, page);
+
+            if (cancelled) return;
+
+            setAllSearchMovies(null);
+            setCanSortSearch(false);
+            setMovies(data.results.map(formatMovie));
+            setTotalPages(data.total_pages);
+            setTotalResults(data.total_results);
+            return;
+          }
+
+          const data = await fetchAllSearchMovies(searchQuery);
+
+          if (cancelled) return;
+
+          searchCacheRef.current = {
+            query: searchQuery,
+            results: data.results,
+            totalPages: data.total_pages,
+            totalResults: data.total_results,
+            canSort: data.canSort,
+          };
+
+          setCanSortSearch(data.canSort);
+          setTotalPages(data.total_pages);
+          setTotalResults(data.total_results);
+
+          if (data.canSort) {
+            setAllSearchMovies(data.results);
+            setMovies([]);
+          } else {
+            setAllSearchMovies(null);
+            setMovies(data.results.map(formatMovie));
+          }
+
+          return;
+        }
+
+        searchCacheRef.current = null;
+        setAllSearchMovies(null);
+        setCanSortSearch(null);
+
         const data = await fetchMovies(searchQuery, genre, sort, nowPlaying, page);
 
-        // 古いリクエストの結果なら画面を更新しない
         if (cancelled) return;
 
-        const formattedMovies = data.results.map(formatMovie);
-
-        setMovies(formattedMovies);
-
+        setMovies(data.results.map(formatMovie));
         setTotalPages(data.total_pages);
         setTotalResults(data.total_results);
       } catch (error) {
-        // 古いリクエストのエラーは表示しない
         if (cancelled) return;
 
         console.error(error);
         setMovies([]);
+        setAllSearchMovies(null);
         setError('映画データの取得に失敗しました。');
       } finally {
-        // 古いリクエストの終了で現在のローディングを解除しない
         if (!cancelled) {
           setLoading(false);
         }
@@ -134,6 +202,19 @@ function App() {
       cancelled = true;
     };
   }, [searchQuery, genre, sort, nowPlaying, page]);
+
+  // 全件取得した映画を並び替え、現在のページに必要な20件を表示する
+  const displayMovies = useMemo(() => {
+    if (!searchQuery || !canSortSearch || !allSearchMovies) {
+      return movies;
+    }
+
+    const sortedMovies = sortMovies(allSearchMovies, sort as MovieSortOrder);
+
+    const startIndex = (page - 1) * 20;
+
+    return sortedMovies.slice(startIndex, startIndex + 20).map(formatMovie);
+  }, [searchQuery, canSortSearch, allSearchMovies, sort, page, movies]);
 
   // アンマウント時のタイマー解除
   useEffect(() => {
@@ -443,10 +524,10 @@ function App() {
           <div id="movieList" className="movieGrid">
             {loading ? (
               Array.from({ length: 6 }).map((_, index) => <div key={index} className="skeleton skeleton-card"></div>)
-            ) : !error && movies.length === 0 ? (
+            ) : !error && displayMovies.length === 0 ? (
               <p>データがありません</p>
             ) : (
-              movies.map(movie => (
+              displayMovies.map(movie => (
                 <MovieCard
                   key={movie.id}
                   movie={movie}

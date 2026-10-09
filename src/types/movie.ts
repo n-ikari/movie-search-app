@@ -3,6 +3,7 @@ export type TmdbMovie = {
   title?: string
   release_date?: string
   vote_average?: number
+  popularity?: number
   overview?: string
   poster_path?: string | null
   genre_ids?: number[]

@@ -59,6 +59,65 @@ export async function fetchMovies(
   return data;
 }
 
+// 映画名検索の全件取得上限
+export const SEARCH_SORT_LIMIT = 100;
+
+type MovieSearchResult = {
+  results: TmdbMovie[];
+  total_pages: number;
+  total_results: number;
+  canSort: boolean;
+};
+
+// 映画名検索の結果が上限以下の場合、全ページを取得する
+export async function fetchAllSearchMovies(query: string): Promise<MovieSearchResult> {
+  // 最初のページを取得して総件数を確認する
+  const firstPage = await fetchMovies(query, '', 'popularity.desc', false, 1);
+
+  // 上限を超える場合は、追加取得せず従来の検索結果を返す
+  if (firstPage.total_results > SEARCH_SORT_LIMIT) {
+    return {
+      results: firstPage.results,
+      total_pages: firstPage.total_pages,
+      total_results: firstPage.total_results,
+      canSort: false,
+    };
+  }
+
+  // 1ページ以下の場合は追加通信しない
+  if (firstPage.total_pages <= 1) {
+    return {
+      results: firstPage.results,
+      total_pages: firstPage.total_pages,
+      total_results: firstPage.total_results,
+      canSort: true,
+    };
+  }
+
+  // 2ページ目以降を並列取得する
+  const remainingPages = Array.from(
+    { length: firstPage.total_pages - 1 },
+    (_, index) => index + 2
+  );
+
+  const responses = await Promise.all(
+    remainingPages.map(page => fetchMovies(query, '', 'popularity.desc', false, page))
+  );
+
+  // 全ページの映画データを1つの配列にまとめる
+  const allMovies = [
+    ...firstPage.results,
+    ...responses.flatMap(response => response.results),
+  ];
+
+  return {
+    results: allMovies,
+    total_pages: firstPage.total_pages,
+    total_results: firstPage.total_results,
+    canSort: true,
+  };
+}
+
 type TmdbMovieDetail = {
   id: number;
   title: string;
