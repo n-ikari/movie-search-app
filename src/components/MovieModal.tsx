@@ -278,10 +278,6 @@ function MovieModal({ movie, isFavorite, onToggleFavorite, onClose }: MovieModal
         aria-label={movie.title}
         tabIndex={-1}>
         <div className="modalActions">
-          <button ref={closeButtonRef} type="button" id="modalClose" aria-label="閉じる" onClick={handleClose}>
-            ✕
-          </button>
-
           <button
             type="button"
             className={`favBtn ${isFavorite ? 'active' : ''} ${isPopping ? 'pop' : ''}`}
@@ -295,6 +291,10 @@ function MovieModal({ movie, isFavorite, onToggleFavorite, onClose }: MovieModal
               setIsPopping(false);
             }}>
             ❤
+          </button>
+
+          <button ref={closeButtonRef} type="button" id="modalClose" aria-label="閉じる" onClick={handleClose}>
+            ✕
           </button>
         </div>
 

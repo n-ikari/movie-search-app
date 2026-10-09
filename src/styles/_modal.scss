@@ -1,4 +1,5 @@
 /* モーダル背景 */
+/* モーダル背景 */
 .modal {
   position: fixed;
   inset: 0;
@@ -7,14 +8,25 @@
   justify-content: center;
   align-items: center;
   padding: 20px;
-  background: rgba(0, 0, 0, 0.75);
 
-  &.show {
+  // 暗幕を疑似要素として分離
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgb(0 0 0 / 45%);
+    pointer-events: none;
+  }
+
+  &.show::before {
     animation: modalFadeIn 0.3s ease forwards;
   }
 
-  &.closing {
+  &.closing::before {
     animation: modalFadeOut 0.3s ease forwards;
+  }
+
+  &.closing {
     pointer-events: none;
   }
 }
@@ -22,14 +34,46 @@
 /* モーダル本体 */
 .modal-content {
   position: relative;
+  z-index: 1;
   width: 100%;
   max-width: 900px;
   max-height: 90vh;
   overflow-y: auto;
   padding: 30px;
-  background: #fff;
-  color: #333;
+
+  background: rgb(32 40 56 / 70%);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgb(255 255 255 / 12%);
   border-radius: 12px;
+
+  @media (max-width: 600px) {
+    padding: 15px;
+  }
+
+  // Firefox用
+  scrollbar-width: thin;
+  scrollbar-color: #718096 transparent;
+
+  // Chrome・Edge・Safari用
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #718096;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: #a9b4c7;
+  }
 }
 
 /* 閉じるボタン・お気に入りボタン */
@@ -38,11 +82,15 @@
   top: 0;
   z-index: 10;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   gap: 8px;
   width: fit-content;
   margin-left: auto;
+
+  padding: 8px;
+  border-radius: 8px;
+  // background: rgb(32 40 56 / 95%);
 }
 
 #modalClose {
@@ -50,9 +98,31 @@
   margin-left: 0;
   border: none;
   background: transparent;
-  color: #333;
+  color: #f5f5f5;
   font-size: 24px;
   cursor: pointer;
+}
+
+/* モーダル内のお気に入りボタン */
+.modalActions .favBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #e875a6;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+
+  &:hover {
+    background: transparent;
+  }
 }
 
 /* モーダル内のレイアウト */
@@ -82,9 +152,15 @@
 }
 
 .modalGridRight {
+  padding-right: 50px;
+
   h2 {
     margin-top: 0;
-    color: #333;
+    color: #f5f5f5;
+  }
+
+  @media (max-width: 600px) {
+    padding-right: 0;
   }
 }
 
@@ -136,5 +212,38 @@
 
   to {
     opacity: 0;
+  }
+}
+
+// モーダル本体の開閉アニメーション
+.modal.show .modal-content {
+  animation: modalContentFadeIn 0.3s ease both;
+}
+
+.modal.closing .modal-content {
+  animation: modalContentFadeOut 0.3s ease both;
+}
+
+@keyframes modalContentFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes modalContentFadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(12px);
   }
 }
