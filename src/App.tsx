@@ -9,6 +9,7 @@ import FavoritesPage from './components/FavoritesPage';
 import MovieModal from './components/MovieModal';
 import SearchForm from './components/SearchForm';
 import StickySearch from './components/StickySearch';
+import AppFooter from './components/AppFooter';
 
 // 選択肢（ジャンル）をReactで表示する。固定データ。
 const genreMap = {
@@ -109,6 +110,7 @@ function App() {
         const formattedMovies = data.results.map(formatMovie);
 
         setMovies(formattedMovies);
+
         setTotalPages(data.total_pages);
         setTotalResults(data.total_results);
       } catch (error) {
@@ -205,22 +207,23 @@ function App() {
   }
 
   // 現在の状態
-  let currentStateText = '';
+
+  const currentStateItems: string[] = [];
 
   if (searchQuery) {
-    currentStateText += `検索: ${searchQuery} `;
+    currentStateItems.push(`検索：${searchQuery}`);
   }
 
   if (genre) {
-    currentStateText += `ジャンル: ${genreMap[Number(genre) as keyof typeof genreMap]} `;
+    currentStateItems.push(`ジャンル：${genreMap[Number(genre) as keyof typeof genreMap]}`);
   }
 
   if (nowPlaying) {
-    currentStateText += '現在公開中 ';
+    currentStateItems.push('最近1ヶ月');
   }
 
   if (!searchQuery) {
-    currentStateText += `並び: ${sortMap[sort as keyof typeof sortMap]}`;
+    currentStateItems.push(`並び：${sortMap[sort as keyof typeof sortMap]}`);
   }
 
   // ページ切り替え時に画面上部へスクロールする
@@ -327,6 +330,13 @@ function App() {
 
   return (
     <main className={`container ${currentView === 'favorites' ? 'view-favorites' : 'view-search'}`}>
+      <header className="appHeader">
+        <div className="appBrand">CinePick</div>
+        {currentView === 'search' && (
+          <p className="appDescription">映画を探して、お気に入りを保存できる映画検索アプリ。</p>
+        )}
+      </header>
+
       {currentView === 'favorites' ? (
         <FavoritesPage
           favorites={favorites}
@@ -340,7 +350,7 @@ function App() {
         />
       ) : (
         <>
-          <h1>映画検索</h1>
+          <h1 className="pageTitle">映画を探す</h1>
 
           <div ref={searchFormRef}>
             <SearchForm
@@ -395,18 +405,29 @@ function App() {
               />
             </div>
           )}
+          <div className="searchToolbar">
+            <div id="currentState" aria-label="現在の検索条件">
+              {currentStateItems.length > 0 ? (
+                currentStateItems.map(item => (
+                  <span key={item} className="currentStateChip">
+                    {item}
+                  </span>
+                ))
+              ) : (
+                <span className="currentStateChip">すべての映画</span>
+              )}
+            </div>
 
-          <div id="currentState">{currentStateText || 'すべての映画'}</div>
-
-          <button
-            type="button"
-            className="pageLink"
-            onClick={() => {
-              setCurrentView('favorites');
-              scrollTop();
-            }}>
-            ❤&nbsp;お気に入り一覧
-          </button>
+            <button
+              type="button"
+              className="pageLink"
+              onClick={() => {
+                setCurrentView('favorites');
+                scrollTop();
+              }}>
+              ❤&nbsp;お気に入り一覧
+            </button>
+          </div>
 
           <button
             type="button"
@@ -473,6 +494,7 @@ function App() {
         <MovieModal
           movie={selectedMovie}
           isFavorite={favorites.some(favorite => favorite.id === selectedMovie.id)}
+          isFavoritesView={currentView === 'favorites'}
           onToggleFavorite={movie => {
             if (currentView === 'favorites') {
               removeFavoriteWithAnimation(movie);
@@ -486,6 +508,7 @@ function App() {
       )}
       {/* トースト */}
       {toast && <div className={`toast ${toast.type} ${toast.isLeaving ? 'hide' : 'show'}`}>{toast.message}</div>}
+      <AppFooter />
     </main>
   );
 }

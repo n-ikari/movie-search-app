@@ -7,9 +7,10 @@ type MovieModalProps = {
   isFavorite: boolean;
   onToggleFavorite: (movie: Movie) => void;
   onClose: () => void;
+  isFavoritesView: boolean;
 };
 
-function MovieModal({ movie, isFavorite, onToggleFavorite, onClose }: MovieModalProps) {
+function MovieModal({ movie, isFavorite, isFavoritesView, onToggleFavorite, onClose }: MovieModalProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const modalContentRef = useRef<HTMLDivElement>(null);
 
@@ -290,7 +291,7 @@ function MovieModal({ movie, isFavorite, onToggleFavorite, onClose }: MovieModal
             onAnimationEnd={() => {
               setIsPopping(false);
             }}>
-            ❤
+            {isFavoritesView ? '❤ 削除' : '❤'}
           </button>
 
           <button ref={closeButtonRef} type="button" id="modalClose" aria-label="閉じる" onClick={handleClose}>

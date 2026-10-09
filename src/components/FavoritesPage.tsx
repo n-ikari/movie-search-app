@@ -32,7 +32,7 @@ function FavoritesPage({ favorites, removingIds, onRemoveFavorite, onOpenModal, 
 
   return (
     <>
-      <h1>お気に入り映画</h1>
+      <h1 className="pageTitle">お気に入り映画</h1>
 
       <button type="button" className="pageLink" onClick={onBack}>
         ← 検索に戻る

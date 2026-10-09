@@ -1,39 +1,101 @@
 /* お気に入り一覧：検索画面に戻る固定ボタン */
+
+/* 通常の画面切り替えボタン */
+.pageLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  margin: 12px 0 24px;
+  padding: 10px 18px;
+
+  border: 1px solid rgb(139 131 233 / 40%);
+  border-radius: 9999px;
+
+  background: rgb(52 46 74 / 75%);
+  color: #f5f5f5;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+
+  &:hover {
+    background: rgb(83 68 125 / 85%);
+    transform: translateY(-2px);
+  }
+
+  &:focus-visible {
+    outline: 3px solid #a6b6ff;
+    outline-offset: 3px;
+  }
+}
+
+/* 右下に固定する画面切り替えボタン */
 .backToSearchFixed {
   position: fixed;
   right: 24px;
   bottom: 24px;
   z-index: 100;
 
-  padding: 12px 18px;
-  border: none;
-  border-radius: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
-  background: #333;
+  padding: 12px 18px;
+  border: 1px solid rgb(255 255 255 / 15%);
+  border-radius: 9999px;
+
+  background: linear-gradient(135deg, #4678d9, #7855c9);
   color: #fff;
   font-size: 14px;
-  font-weight: bold;
-  cursor: pointer;
+  font-weight: 600;
 
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 25%);
+
   transition:
-    background 0.2s,
-    transform 0.2s;
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 
   &:hover {
-    background: #555;
+    box-shadow: 0 8px 24px rgb(70 120 217 / 35%);
     transform: translateY(-2px);
   }
 
   &:focus-visible {
-    outline: 2px solid #ff69b4;
+    outline: 3px solid #a6b6ff;
     outline-offset: 3px;
   }
 
   @media (max-width: 600px) {
-    right: 16px;
-    bottom: 16px;
+    right: 12px;
+    bottom: 12px;
     padding: 10px 14px;
     font-size: 13px;
   }
+}
+
+/* お気に入り一覧へ進むボタン */
+.view-search {
+  .pageLink,
+  .backToSearchFixed {
+    border-color: rgb(255 255 255 / 18%);
+    background: linear-gradient(135deg, #ed6ca7, #9256d6);
+    color: #fff;
+
+    &:hover {
+      background: linear-gradient(135deg, #f582b8, #a76ce7);
+      box-shadow: 0 6px 20px rgb(237 108 167 / 30%);
+    }
+  }
+}
+
+.view-favorites > .pageLink {
+  display: flex;
+  width: fit-content;
+  margin: 12px 0 24px;
+  margin-left: max(12px, calc((100% - 1200px) / 2));
 }

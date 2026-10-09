@@ -1,0 +1,45 @@
+
+.appFooter {
+  margin-top: 48px;
+  padding: 28px 20px;
+  border-top: 1px solid rgb(255 255 255 / 10%);
+}
+
+.appFooterInner {
+  width: min(100%, 1200px);
+  margin: 0 auto;
+}
+
+.appFooterCredit {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  color: #aebbd3;
+  font-size: 12px;
+
+  a {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  img {
+    display: block;
+    width: 100px;
+    height: auto;
+  }
+}
+
+.appFooterNotice {
+  margin: 14px 0 0;
+  color: #aebbd3;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+@media (max-width: 767px) {
+  .appFooter {
+    margin-top: 32px;
+    padding: 24px 12px;
+  }
+}
