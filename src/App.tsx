@@ -277,7 +277,7 @@ function App() {
   }
 
   return (
-    <main className="container">
+    <main className={`container ${currentView === 'favorites' ? 'view-favorites' : 'view-search'}`}>
       {currentView === 'favorites' ? (
         <FavoritesPage
           favorites={favorites}
