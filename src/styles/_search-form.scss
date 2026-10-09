@@ -1,0 +1,103 @@
+/* 検索・絞り込みエリア */
+.l-serchWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 1000px;
+  margin: 24px auto;
+  padding: 24px;
+  background: #242b3b;
+  border: 1px solid rgb(255 255 255 / 8%);
+  border-radius: 16px;
+
+  @media (max-width: 600px) {
+    gap: 16px;
+    margin: 20px 16px;
+    padding: 16px;
+  }
+}
+
+/* ジャンル・並び順・最近1ヶ月 */
+.l-sortArea {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+
+  select {
+    flex: 1 1 180px;
+    min-width: 0;
+  }
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #f5f5f5;
+    cursor: pointer;
+  }
+
+  input[type='checkbox'] {
+    width: 18px;
+    height: 18px;
+    accent-color: #d35f92;
+    cursor: pointer;
+  }
+}
+
+/* セレクトボックス・検索入力欄 */
+.l-sortArea select,
+.l-serchArea input {
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid #485269;
+  border-radius: 8px;
+  outline: none;
+  background: #171b27;
+  color: #f5f5f5;
+  font: inherit;
+
+  &:focus-visible {
+    border-color: #e875a6;
+    box-shadow: 0 0 0 3px rgb(232 117 166 / 20%);
+  }
+}
+
+/* 映画名検索 */
+.l-serchArea {
+  display: flex;
+  gap: 12px;
+
+  input {
+    flex: 1;
+    min-width: 0;
+
+    &::placeholder {
+      color: #8895aa;
+    }
+  }
+
+  button {
+    min-height: 44px;
+    padding: 10px 28px;
+    border: none;
+    border-radius: 8px;
+    background: #d35f92;
+    color: #fff;
+    font: inherit;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background: #e875a6;
+    }
+  }
+
+  @media (max-width: 600px) {
+    gap: 8px;
+
+    button {
+      padding-inline: 18px;
+    }
+  }
+}
