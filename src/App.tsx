@@ -7,6 +7,7 @@ import type { Movie } from './types/movie';
 import { loadFavorites, saveFavorites } from './utils/favoritesStore';
 import FavoritesPage from './components/FavoritesPage';
 import MovieModal from './components/MovieModal';
+import SearchForm from './components/SearchForm';
 
 // 選択肢（ジャンル）をReactで表示する。固定データ。
 const genreMap = {
@@ -293,57 +294,24 @@ function App() {
         <>
           <h1>映画検索</h1>
 
-          <div className="l-serchWrap">
-            <div className="l-sortArea">
-              <select id="genreFilter" value={genre} onChange={handleGenreChange}>
-                <option value="">すべて</option>
-
-                {Object.entries(genreMap).map(([id, name]) => (
-                  <option key={id} value={id}>
-                    {name}
-                  </option>
-                ))}
-              </select>
-
-              <select
-                id="sortSelect"
-                value={sort}
-                onChange={e => {
-                  setSort(e.target.value);
-                  setPage(1);
-                }}>
-                <option value="popularity.desc">人気順</option>
-                <option value="vote_average.desc">評価順</option>
-                <option value="primary_release_date.desc">公開日順</option>
-              </select>
-
-              <label>
-                <input
-                  type="checkbox"
-                  id="nowPlayingCheck"
-                  checked={nowPlaying}
-                  onChange={e => {
-                    setNowPlaying(e.target.checked);
-                    setPage(1);
-                  }}
-                />
-                最近1ヶ月
-              </label>
-            </div>
-
-            <form className="l-serchArea" onSubmit={handleSearch}>
-              <input
-                type="text"
-                id="searchInput"
-                placeholder="映画名で検索"
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-              />
-              <button type="submit" id="searchBtn">
-                検索
-              </button>
-            </form>
-          </div>
+          <SearchForm
+            query={query}
+            genre={genre}
+            sort={sort}
+            nowPlaying={nowPlaying}
+            genreOptions={genreMap}
+            onQueryChange={setQuery}
+            onGenreChange={handleGenreChange}
+            onSortChange={value => {
+              setSort(value);
+              setPage(1);
+            }}
+            onNowPlayingChange={checked => {
+              setNowPlaying(checked);
+              setPage(1);
+            }}
+            onSearch={handleSearch}
+          />
 
           <div id="currentState">{currentStateText || 'すべての映画'}</div>
 
