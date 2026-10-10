@@ -1,10 +1,10 @@
 /* お気に入り登録・削除時のトースト通知 */
 .toast {
   position: fixed;
-  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  top: 50%;
   left: 50%;
   z-index: 9999;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
 
   width: max-content;
   max-width: calc(100vw - 32px);
@@ -44,23 +44,23 @@
 @keyframes toastSlideIn {
   from {
     opacity: 0;
-    transform: translateX(-50%) translateY(12px);
+    transform: translate(-50%, calc(-50% + 12px));
   }
 
   to {
     opacity: 1;
-    transform: translateX(-50%) translateY(0);
+    transform: translate(-50%, -50%);
   }
 }
 
 @keyframes toastSlideOut {
   from {
     opacity: 1;
-    transform: translateX(-50%) translateY(0);
+    transform: translate(-50%, -50%);
   }
 
   to {
     opacity: 0;
-    transform: translateX(-50%) translateY(12px);
+    transform: translate(-50%, calc(-50% + 12px));
   }
 }
