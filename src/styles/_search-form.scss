@@ -9,6 +9,10 @@
   border: 1px solid rgb(111 132 191 / 25%);
   border-radius: 20px;
 
+  @media (min-width: 601px) and (max-width: 1048px) {
+    margin-inline: 24px;
+  }
+
   @media (max-width: 600px) {
     gap: 16px;
     margin: 20px 16px;

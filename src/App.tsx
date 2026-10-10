@@ -423,7 +423,7 @@ function App() {
   return (
     <main className={`container ${currentView === 'favorites' ? 'view-favorites' : 'view-search'}`}>
       <header className="appHeader">
-        <div className="appBrand">CinePick</div>
+        <div className="appBrand">CinemaPick</div>
         {currentView === 'search' && (
           <p className="appDescription">映画を探して、お気に入りを保存できる映画検索アプリ。</p>
         )}
@@ -507,6 +507,9 @@ function App() {
                 currentStateItems.map(item => (
                   <span key={item} className="currentStateChip">
                     {item}
+                    {searchQuery && item === `検索：${searchQuery}` && !loading && !error && (
+                      <span className="searchResultCount">{totalResults}件</span>
+                    )}
                   </span>
                 ))
               ) : (
