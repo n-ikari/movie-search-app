@@ -255,8 +255,16 @@ function App() {
   // ジャンル選択 → 映画名検索を解除＋検索欄も空にする
   function handleSearch(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setSearchQuery(query);
+
+    const nextQuery = query.trim();
+
+    setSearchQuery(nextQuery);
     setGenre('');
+
+    if (nextQuery) {
+      setNowPlaying(false);
+    }
+
     setPage(1);
   }
 
@@ -439,6 +447,7 @@ function App() {
               genre={genre}
               sort={sort}
               nowPlaying={nowPlaying}
+              disableNowPlaying={Boolean(searchQuery)}
               genreOptions={genreMap}
               onQueryChange={setQuery}
               onGenreChange={handleGenreChange}
@@ -466,6 +475,7 @@ function App() {
                 genre={genre}
                 sort={sort}
                 nowPlaying={nowPlaying}
+                disableNowPlaying={Boolean(searchQuery)}
                 genreOptions={genreMap}
                 onQueryChange={setQuery}
                 onGenreChange={event => {
@@ -523,7 +533,9 @@ function App() {
           {error && <p className="error-message">{error}</p>}
           <div id="movieList" className="movieGrid">
             {loading ? (
-              Array.from({ length: 6 }).map((_, index) => <div key={index} className="skeleton skeleton-card"></div>)
+              Array.from({ length: 6 }).map((_, index) => (
+                <div key={index} className="skeleton skeleton-card"></div>
+              ))
             ) : !error && displayMovies.length === 0 ? (
               <p>データがありません</p>
             ) : (
@@ -588,7 +600,11 @@ function App() {
         />
       )}
       {/* トースト */}
-      {toast && <div className={`toast ${toast.type} ${toast.isLeaving ? 'hide' : 'show'}`}>{toast.message}</div>}
+      {toast && (
+        <div className={`toast ${toast.type} ${toast.isLeaving ? 'hide' : 'show'}`}>
+          {toast.message}
+        </div>
+      )}
       <AppFooter />
     </main>
   );

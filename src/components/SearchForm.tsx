@@ -5,9 +5,12 @@ type SearchFormProps = {
   genre: string;
   sort: string;
   nowPlaying: boolean;
+  disableNowPlaying?: boolean;
   genreOptions: Record<number, string>;
   onQueryChange: (value: string) => void;
-  onGenreChange: (event: ChangeEvent<HTMLSelectElement>) => void;
+  onGenreChange: (
+    event: ChangeEvent<HTMLSelectElement>
+  ) => void;
   onSortChange: (value: string) => void;
   onNowPlayingChange: (checked: boolean) => void;
   onSearch: (event: FormEvent<HTMLFormElement>) => void;
@@ -19,6 +22,7 @@ function SearchForm({
   genre,
   sort,
   nowPlaying,
+  disableNowPlaying = false,
   genreOptions,
   onQueryChange,
   onGenreChange,
@@ -36,7 +40,9 @@ function SearchForm({
           aria-label="映画名"
           placeholder="映画名で検索"
           value={query}
-          onChange={event => onQueryChange(event.target.value)}
+          onChange={event =>
+            onQueryChange(event.target.value)
+          }
         />
 
         <button type="submit" id={`${idPrefix}searchBtn`}>
@@ -44,28 +50,45 @@ function SearchForm({
         </button>
       </form>
       <div className="l-sortArea">
-        <select id={`${idPrefix}genreFilter`} aria-label="ジャンル" value={genre} onChange={onGenreChange}>
+        <select
+          id={`${idPrefix}genreFilter`}
+          aria-label="ジャンル"
+          value={genre}
+          onChange={onGenreChange}>
           <option value="">すべて</option>
 
-          {Object.entries(genreOptions).map(([id, name]) => (
-            <option key={id} value={id}>
-              {name}
-            </option>
-          ))}
+          {Object.entries(genreOptions).map(
+            ([id, name]) => (
+              <option key={id} value={id}>
+                {name}
+              </option>
+            )
+          )}
         </select>
 
-        <select id={`${idPrefix}sortSelect`} aria-label="並び順" value={sort} onChange={event => onSortChange(event.target.value)}>
+        <select
+          id={`${idPrefix}sortSelect`}
+          aria-label="並び順"
+          value={sort}
+          onChange={event =>
+            onSortChange(event.target.value)
+          }>
           <option value="popularity.desc">人気順</option>
           <option value="vote_average.desc">評価順</option>
-          <option value="primary_release_date.desc">公開日順</option>
+          <option value="primary_release_date.desc">
+            公開日順
+          </option>
         </select>
 
         <label>
           <input
             type="checkbox"
-            id="nowPlayingCheck"
-            checked={nowPlaying}
-            onChange={event => onNowPlayingChange(event.target.checked)}
+            id={`${idPrefix}nowPlayingCheck`}
+            checked={disableNowPlaying ? false : nowPlaying}
+            disabled={disableNowPlaying}
+            onChange={event =>
+              onNowPlayingChange(event.target.checked)
+            }
           />
           最近1ヶ月
         </label>
