@@ -1,4 +1,3 @@
-
 function AppFooter() {
   return (
     <footer className="appFooter">
@@ -13,6 +12,7 @@ function AppFooter() {
         <p className="appFooterNotice">
           This product uses the TMDB API but is not endorsed or certified by TMDB.
         </p>
+        <small className="appFooterCopyright">© 2026 CinemaPick. Developed by n-ikari.</small>
       </div>
     </footer>
   );
