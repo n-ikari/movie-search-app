@@ -6,11 +6,10 @@ type SearchFormProps = {
   sort: string;
   nowPlaying: boolean;
   disableNowPlaying?: boolean;
+  disableSort?: boolean;
   genreOptions: Record<number, string>;
   onQueryChange: (value: string) => void;
-  onGenreChange: (
-    event: ChangeEvent<HTMLSelectElement>
-  ) => void;
+  onGenreChange: (event: ChangeEvent<HTMLSelectElement>) => void;
   onSortChange: (value: string) => void;
   onNowPlayingChange: (checked: boolean) => void;
   onSearch: (event: FormEvent<HTMLFormElement>) => void;
@@ -23,6 +22,7 @@ function SearchForm({
   sort,
   nowPlaying,
   disableNowPlaying = false,
+  disableSort = false,
   genreOptions,
   onQueryChange,
   onGenreChange,
@@ -40,9 +40,7 @@ function SearchForm({
           aria-label="映画名"
           placeholder="映画名で検索"
           value={query}
-          onChange={event =>
-            onQueryChange(event.target.value)
-          }
+          onChange={event => onQueryChange(event.target.value)}
         />
 
         <button type="submit" id={`${idPrefix}searchBtn`}>
@@ -57,28 +55,35 @@ function SearchForm({
           onChange={onGenreChange}>
           <option value="">すべて</option>
 
-          {Object.entries(genreOptions).map(
-            ([id, name]) => (
-              <option key={id} value={id}>
-                {name}
-              </option>
-            )
-          )}
+          {Object.entries(genreOptions).map(([id, name]) => (
+            <option key={id} value={id}>
+              {name}
+            </option>
+          ))}
         </select>
 
         <select
           id={`${idPrefix}sortSelect`}
           aria-label="並び順"
           value={sort}
-          onChange={event =>
-            onSortChange(event.target.value)
-          }>
-          <option value="popularity.desc">人気順</option>
-          <option value="vote_average.desc">評価順</option>
-          <option value="primary_release_date.desc">
-            公開日順
-          </option>
+          disabled={disableSort}
+          onChange={event => onSortChange(event.target.value)}>
+          {disableSort ? (
+            <option value={sort}>並び替え不可</option>
+          ) : (
+            <>
+              <option value="popularity.desc">人気順</option>
+              <option value="vote_average.desc">評価順</option>
+              <option value="primary_release_date.desc">公開日順</option>
+            </>
+          )}
         </select>
+
+        {disableSort && (
+          <p className="sortNotice" role="status">
+            検索結果が100件を超えるため、並び替えは利用できません。
+          </p>
+        )}
 
         <label>
           <input
@@ -86,9 +91,7 @@ function SearchForm({
             id={`${idPrefix}nowPlayingCheck`}
             checked={disableNowPlaying ? false : nowPlaying}
             disabled={disableNowPlaying}
-            onChange={event =>
-              onNowPlayingChange(event.target.checked)
-            }
+            onChange={event => onNowPlayingChange(event.target.checked)}
           />
           最近1ヶ月
         </label>

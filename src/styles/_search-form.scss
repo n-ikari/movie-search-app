@@ -26,6 +26,14 @@
     flex: 1 1 180px;
     min-width: 0;
     cursor: pointer;
+
+    &:disabled {
+      background: #202633;
+      border-color: #3b455a;
+      color: #929caf;
+      cursor: not-allowed;
+      opacity: 1;
+    }
   }
 
   label {
@@ -34,6 +42,11 @@
     gap: 8px;
     color: #f5f5f5;
     cursor: pointer;
+
+    &:has(input:disabled) {
+      color: #929caf;
+      cursor: not-allowed;
+    }
   }
 
   input[type='checkbox'] {
@@ -69,6 +82,12 @@
     &:focus-visible {
       outline: 3px solid #a6b6ff;
       outline-offset: 3px;
+    }
+
+    &:disabled {
+      border-color: #667085;
+      background: #202633;
+      cursor: not-allowed;
     }
   }
 }
@@ -132,4 +151,12 @@
       padding-inline: 18px;
     }
   }
+}
+
+.sortNotice {
+  flex: 1 1 100%;
+  margin: 0;
+  color: #aebbd3;
+  font-size: 0.85rem;
+  line-height: 1.5;
 }

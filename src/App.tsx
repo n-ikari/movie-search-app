@@ -203,6 +203,9 @@ function App() {
     };
   }, [searchQuery, genre, sort, nowPlaying, page]);
 
+  // 映画名検索で100件を超える場合は並び替えを無効化する
+  const disableSort = Boolean(searchQuery) && canSortSearch === false && !loading && !error;
+
   // 全件取得した映画を並び替え、現在のページに必要な20件を表示する
   const displayMovies = useMemo(() => {
     if (!searchQuery || !canSortSearch || !allSearchMovies) {
@@ -448,6 +451,7 @@ function App() {
               sort={sort}
               nowPlaying={nowPlaying}
               disableNowPlaying={Boolean(searchQuery)}
+              disableSort={disableSort}
               genreOptions={genreMap}
               onQueryChange={setQuery}
               onGenreChange={handleGenreChange}
@@ -476,6 +480,7 @@ function App() {
                 sort={sort}
                 nowPlaying={nowPlaying}
                 disableNowPlaying={Boolean(searchQuery)}
+                disableSort={disableSort}
                 genreOptions={genreMap}
                 onQueryChange={setQuery}
                 onGenreChange={event => {
