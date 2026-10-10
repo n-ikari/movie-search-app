@@ -118,7 +118,6 @@
   border-radius: 0;
   background: transparent;
   box-shadow: none;
-  color: #e875a6;
   font-size: 16px;
   line-height: 1;
   cursor: pointer;
@@ -249,4 +248,21 @@
     opacity: 0;
     transform: translateY(12px);
   }
+}
+
+.modalReleaseDate {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  svg {
+    flex-shrink: 0;
+    color: #a6a0ff;
+  }
+}
+
+.modalGridRight .score {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }

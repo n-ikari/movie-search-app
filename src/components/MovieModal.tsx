@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import { fetchMovieDetail, fetchJapanReleaseDate, fetchMovieTrailer, fetchEnglishOverview } from '../services/tmdbApi';
+import {
+  fetchMovieDetail,
+  fetchJapanReleaseDate,
+  fetchMovieTrailer,
+  fetchEnglishOverview,
+} from '../services/tmdbApi';
 import type { Movie } from '../types/movie';
+import { CalendarDays, Globe, Heart, Star } from 'lucide-react';
 
 type MovieModalProps = {
   movie: Movie;
@@ -10,7 +16,13 @@ type MovieModalProps = {
   isFavoritesView: boolean;
 };
 
-function MovieModal({ movie, isFavorite, isFavoritesView, onToggleFavorite, onClose }: MovieModalProps) {
+function MovieModal({
+  movie,
+  isFavorite,
+  isFavoritesView,
+  onToggleFavorite,
+  onClose,
+}: MovieModalProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const modalContentRef = useRef<HTMLDivElement>(null);
 
@@ -100,13 +112,19 @@ function MovieModal({ movie, isFavorite, isFavoritesView, onToggleFavorite, onCl
 
       if (event.shiftKey) {
         // Shift + Tab：最初の要素から最後の要素へ
-        if (document.activeElement === firstElement || !modalContent.contains(document.activeElement)) {
+        if (
+          document.activeElement === firstElement ||
+          !modalContent.contains(document.activeElement)
+        ) {
           event.preventDefault();
           lastElement.focus();
         }
       } else {
         // Tab：最後の要素から最初の要素へ
-        if (document.activeElement === lastElement || !modalContent.contains(document.activeElement)) {
+        if (
+          document.activeElement === lastElement ||
+          !modalContent.contains(document.activeElement)
+        ) {
           event.preventDefault();
           firstElement.focus();
         }
@@ -291,27 +309,44 @@ function MovieModal({ movie, isFavorite, isFavoritesView, onToggleFavorite, onCl
             onAnimationEnd={() => {
               setIsPopping(false);
             }}>
-            {isFavoritesView ? '❤ 削除' : '❤'}
+            <Heart size={20} strokeWidth={2} aria-hidden="true" />
+            {isFavoritesView && <span>削除</span>}
           </button>
 
-          <button ref={closeButtonRef} type="button" id="modalClose" aria-label="閉じる" onClick={handleClose}>
+          <button
+            ref={closeButtonRef}
+            type="button"
+            id="modalClose"
+            aria-label="閉じる"
+            onClick={handleClose}>
             ✕
           </button>
         </div>
 
         <div className="modalInner">
-          <div className="modalGridLeft">{movie.img ? <img src={movie.img} alt={movie.title} /> : <p>画像なし</p>}</div>
+          <div className="modalGridLeft">
+            {movie.img ? <img src={movie.img} alt={movie.title} /> : <p>画像なし</p>}
+          </div>
 
           <div className="modalGridRight">
             <div className="modalTitleRow">
               <h2>{movie.title}</h2>
             </div>
 
-            <p>🌍 全世界公開日: {movie.date}</p>
-            <p>🗾 日本公開日: {japanReleaseDate}</p>
+            <p className="modalReleaseDate">
+              <Globe size={18} strokeWidth={2} aria-hidden="true" />
+              <span>全世界公開日: {movie.date}</span>
+            </p>
+
+            <p className="modalReleaseDate">
+              <CalendarDays size={18} strokeWidth={2} aria-hidden="true" />
+              <span>日本公開日: {japanReleaseDate}</span>
+            </p>
 
             <p className="score">
-              評価⭐ <span className={movie.scoreClass}>{movie.score}</span>
+              <Star size={18} strokeWidth={2} aria-hidden="true" />
+              <span>評価</span>
+              <span className={movie.scoreClass}>{movie.score}</span>
             </p>
             {detail && detail.genres.length > 0 && (
               <div className="modalGenres">

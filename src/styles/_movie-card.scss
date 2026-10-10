@@ -1,13 +1,20 @@
 /* お気に入りボタン */
 .favBtn {
-  color: #808080;
-  -webkit-text-fill-color: #808080;
-  -webkit-text-stroke: 1px #fff;
+  color: #b9c0cd;
+
+  svg {
+    display: block;
+    fill: none;
+    stroke: currentColor;
+  }
 
   /* お気に入り登録済み */
   &.active {
     color: #ff69b4;
-    -webkit-text-fill-color: #ff69b4;
+
+    svg {
+      fill: currentColor;
+    }
   }
 
   /* クリック時のアニメーション */
@@ -132,5 +139,12 @@
   &:focus-visible {
     outline: 2px solid #fff;
     outline-offset: 2px;
+  }
+}
+
+.score {
+  svg {
+    flex-shrink: 0;
+    color: #f5c451;
   }
 }

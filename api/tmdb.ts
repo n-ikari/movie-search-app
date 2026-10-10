@@ -86,6 +86,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
                   'popularity.asc',
                   'release_date.desc',
                   'release_date.asc',
+                  'primary_release_date.desc',
                   'vote_average.desc',
                   'vote_average.asc',
                 ].includes(value)

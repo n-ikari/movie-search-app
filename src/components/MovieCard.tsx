@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Movie } from '../types/movie';
+import { Heart, Star } from 'lucide-react';
 
 type MovieCardProps = {
   movie: Movie;
@@ -13,7 +14,13 @@ type MovieCardProps = {
   // isFavorite は省略可能ですが、渡すならbooleanです。
 };
 
-function MovieCard({ movie, isFavorite = false, isRemoving = false, onToggleFavorite, onOpenModal }: MovieCardProps) {
+function MovieCard({
+  movie,
+  isFavorite = false,
+  isRemoving = false,
+  onToggleFavorite,
+  onOpenModal,
+}: MovieCardProps) {
   const [isPopping, setIsPopping] = useState(false);
   return (
     <div
@@ -49,7 +56,7 @@ function MovieCard({ movie, isFavorite = false, isRemoving = false, onToggleFavo
         onAnimationEnd={() => {
           setIsPopping(false);
         }}>
-        ❤
+        <Heart size={20} strokeWidth={2} aria-hidden="true" />
       </button>
 
       <div className="cardPoster">
@@ -60,7 +67,7 @@ function MovieCard({ movie, isFavorite = false, isRemoving = false, onToggleFavo
         <h3 className="movieTitle">{movie.title}</h3>
 
         <p className="score">
-          <span aria-hidden="true">⭐</span>
+          <Star size={17} strokeWidth={2} aria-hidden="true" />
           <span className={movie.scoreClass}>{movie.score}</span>
         </p>
       </div>

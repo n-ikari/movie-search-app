@@ -12,6 +12,7 @@ import MovieModal from './components/MovieModal';
 import SearchForm from './components/SearchForm';
 import StickySearch from './components/StickySearch';
 import AppFooter from './components/AppFooter';
+import { Heart } from 'lucide-react';
 
 // 選択肢（ジャンル）をReactで表示する。固定データ。
 const genreMap = {
@@ -524,7 +525,8 @@ function App() {
                 setCurrentView('favorites');
                 scrollTop();
               }}>
-              ❤&nbsp;お気に入り一覧
+              <Heart size={18} strokeWidth={2} aria-hidden="true" />
+              <span>お気に入り一覧</span>
             </button>
           </div>
 
@@ -535,7 +537,8 @@ function App() {
               setCurrentView('favorites');
               scrollTop();
             }}>
-            ❤ 一覧へ
+            <Heart size={18} strokeWidth={2} aria-hidden="true" />
+            <span>お気に入り一覧</span>
           </button>
 
           {error && <p className="error-message">{error}</p>}
