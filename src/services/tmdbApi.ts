@@ -1,7 +1,6 @@
 import type { TmdbMovie } from '../types/movie';
-
-const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
-const BASE_URL = 'https://api.themoviedb.org/3';
+// ReactからVercel Functions経由で通信する
+const BASE_URL = '/api/tmdb';
 
 type TmdbMovieResponse = {
   page: number;
@@ -29,22 +28,19 @@ export async function fetchMovies(
     const todayStr = today.toISOString().split('T')[0];
     const oneMonthAgoStr = oneMonthAgo.toISOString().split('T')[0];
 
-    releaseDateParams = `&primary_release_date.gte=${oneMonthAgoStr}` + `&primary_release_date.lte=${todayStr}`;
+    releaseDateParams =
+      `&primary_release_date.gte=${oneMonthAgoStr}` + `&primary_release_date.lte=${todayStr}`;
   }
 
   const url = query
-    ? `${BASE_URL}/search/movie` +
-      `?api_key=${API_KEY}` +
+    ? `${BASE_URL}?path=/search/movie` +
       `&language=ja-JP` +
       `&page=${page}` +
       `&query=${encodeURIComponent(query)}`
-    : `${BASE_URL}/discover/movie` +
-      `?api_key=${API_KEY}` +
+    : `${BASE_URL}?path=/discover/movie` +
       `&language=ja-JP` +
       `&page=${page}` +
       `&sort_by=${sort}` +
-      // ジャンル指定がある場合のみ絞り込み条件を追加
-      // /discover/movie に日付条件を追加
       (genre ? `&with_genres=${genre}` : '') +
       releaseDateParams;
 
@@ -95,20 +91,14 @@ export async function fetchAllSearchMovies(query: string): Promise<MovieSearchRe
   }
 
   // 2ページ目以降を並列取得する
-  const remainingPages = Array.from(
-    { length: firstPage.total_pages - 1 },
-    (_, index) => index + 2
-  );
+  const remainingPages = Array.from({ length: firstPage.total_pages - 1 }, (_, index) => index + 2);
 
   const responses = await Promise.all(
     remainingPages.map(page => fetchMovies(query, '', 'popularity.desc', false, page))
   );
 
   // 全ページの映画データを1つの配列にまとめる
-  const allMovies = [
-    ...firstPage.results,
-    ...responses.flatMap(response => response.results),
-  ];
+  const allMovies = [...firstPage.results, ...responses.flatMap(response => response.results)];
 
   return {
     results: allMovies,
@@ -144,7 +134,7 @@ export async function fetchMovieDetail(movieId: number): Promise<TmdbMovieDetail
 
   // ② API通信をPromiseとして作成
   const request = (async () => {
-    const response = await fetch(`${BASE_URL}/movie/${movieId}?api_key=${API_KEY}&language=ja-JP`);
+    const response = await fetch(`${BASE_URL}?path=/movie/${movieId}&language=ja-JP`);
 
     if (!response.ok) {
       throw new Error(`映画詳細の取得に失敗しました: ${response.status}`);
@@ -193,7 +183,7 @@ export async function fetchJapanReleaseDate(movieId: number): Promise<string> {
   }
 
   const request = (async () => {
-    const response = await fetch(`${BASE_URL}/movie/${movieId}/release_dates?api_key=${API_KEY}`);
+    const response = await fetch(`${BASE_URL}?path=/movie/${movieId}/release_dates`);
 
     if (!response.ok) {
       throw new Error(`日本公開日の取得に失敗しました: ${response.status}`);
@@ -252,7 +242,9 @@ export async function fetchMovieTrailer(movieId: number): Promise<string | null>
   const request = (async () => {
     // 指定した言語の予告編を取得する
     async function fetchTrailerByLanguage(language: string): Promise<string | null> {
-      const response = await fetch(`${BASE_URL}/movie/${movieId}/videos?api_key=${API_KEY}&language=${language}`);
+      const response = await fetch(
+        `${BASE_URL}?path=/movie/${movieId}/videos&language=${language}`
+      );
 
       if (!response.ok) {
         throw new Error(`予告編の取得に失敗しました: ${response.status}`);
@@ -262,8 +254,9 @@ export async function fetchMovieTrailer(movieId: number): Promise<string | null>
 
       // YouTubeの公式予告編を優先
       const trailer =
-        data.results.find(video => video.site === 'YouTube' && video.type === 'Trailer' && video.official) ??
-        data.results.find(video => video.site === 'YouTube' && video.type === 'Trailer');
+        data.results.find(
+          video => video.site === 'YouTube' && video.type === 'Trailer' && video.official
+        ) ?? data.results.find(video => video.site === 'YouTube' && video.type === 'Trailer');
 
       return trailer?.key ?? null;
     }
@@ -305,9 +298,7 @@ export async function fetchEnglishOverview(movieId: number): Promise<string> {
   }
 
   const request = (async () => {
-    const response = await fetch(
-      `${BASE_URL}/movie/${movieId}?api_key=${API_KEY}&language=en-US`
-    );
+    const response = await fetch(`${BASE_URL}?path=/movie/${movieId}&language=en-US`);
 
     if (!response.ok) {
       throw new Error(`英語版概要の取得に失敗しました: ${response.status}`);
@@ -327,4 +318,3 @@ export async function fetchEnglishOverview(movieId: number): Promise<string> {
     throw error;
   }
 }
-
