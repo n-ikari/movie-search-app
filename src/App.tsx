@@ -468,8 +468,11 @@ function App() {
             />
           </div>
           {/* 表示条件 */}
-          {currentView === 'search' && showStickySearch && !selectedMovie && (
-            <StickySearch onClick={() => setIsSearchPanelOpen(prev => !prev)} />
+          {currentView === 'search' && (
+            <StickySearch
+              visible={showStickySearch && !selectedMovie}
+              onClick={() => setIsSearchPanelOpen(prev => !prev)}
+            />
           )}
 
           {showStickySearch && isSearchPanelOpen && !selectedMovie && (

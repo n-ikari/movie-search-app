@@ -23,6 +23,15 @@
     background-color 0.2s ease,
     transform 0.2s ease;
 
+  &.is-visible {
+    animation: stickySearchAppear 0.25s ease-out both;
+  }
+
+  &.is-hidden {
+    pointer-events: none;
+    animation: stickySearchDisappear 0.25s ease-in both;
+  }
+
   &:hover {
     background: linear-gradient(135deg, #5a8bef, #9068df);
     transform: translateY(-2px);
@@ -86,5 +95,38 @@
     // 左右12pxの余白を確保
     width: auto;
     padding: 14px;
+  }
+}
+
+@keyframes stickySearchAppear {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stickySearchButton {
+    &.is-visible,
+    &.is-hidden {
+      animation-duration: 0.01ms;
+    }
+  }
+}
+
+@keyframes stickySearchDisappear {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(10px);
   }
 }

@@ -1,15 +1,38 @@
+import { useState } from 'react';
+import type { AnimationEvent } from 'react';
 
 type StickySearchProps = {
   onClick: () => void;
+  visible: boolean;
 };
 
-function StickySearch({ onClick }: StickySearchProps) {
+function StickySearch({ onClick, visible }: StickySearchProps) {
+  const [isMounted, setIsMounted] = useState(visible);
+
+  if (visible && !isMounted) {
+    setIsMounted(true);
+  }
+
+  function handleAnimationEnd(event: AnimationEvent<HTMLButtonElement>) {
+    if (event.target !== event.currentTarget) return;
+
+    if (!visible && event.animationName === 'stickySearchDisappear') {
+      setIsMounted(false);
+    }
+  }
+
+  if (!isMounted) return null;
+
   return (
     <button
       type="button"
-      className="stickySearchButton"
+      className={`stickySearchButton ${visible ? 'is-visible' : 'is-hidden'}`}
       aria-label="検索メニューを開く"
+      aria-hidden={!visible}
+      tabIndex={visible ? 0 : -1}
+      disabled={!visible}
       onClick={onClick}
+      onAnimationEnd={handleAnimationEnd}
     >
       <svg
         width="22"
