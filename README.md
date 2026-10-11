@@ -1,75 +1,110 @@
-# React + TypeScript + Vite
+# CinemaPick 🎬
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+映画を検索し、気になる作品をお気に入りに保存できるWebアプリケーションです。
 
-Currently, two official plugins are available:
+**公開サイト：** https://cinemapick.vercel.app/
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 概要
 
-## React Compiler
+CinemaPickは、映画検索から作品情報の確認、お気に入りの管理までを行えるWebアプリです。
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+映画を探す際の使いやすさを重視し、検索条件の切り替え、映画詳細のモーダル表示、スクロール時の追従検索ボタンなどを実装しました。
 
-## Expanding the ESLint configuration
+Vanilla JavaScriptで制作したアプリをReact・TypeScriptへ移行し、コンポーネント設計や状態管理、API通信処理を見直しました。
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 主な機能
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- 映画名検索・ジャンル別検索
+- 人気順・評価順・公開日順の並び替え
+- 最近1ヶ月の公開作品の絞り込み
+- 映画詳細モーダル
+- お気に入りの登録・削除・一覧表示
+- `localStorage` によるお気に入りの保存
+- ページネーション
+- スクロール時の追従検索ボタン
+- レスポンシブ対応
+- 読み込み中のスケルトン表示・エラー表示
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 使用技術
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+| 分類 | 技術 |
+|---|---|
+| フロントエンド | React 19 / TypeScript |
+| ビルドツール | Vite 8 |
+| スタイリング | SCSS |
+| アイコン | Lucide React |
+| 映画データ | TMDB API |
+| サーバー側API | Vercel Functions |
+| ホスティング | Vercel |
+| バージョン管理 | Git / GitHub |
 
+## 実装上の工夫
+
+### API通信の重複防止
+
+映画詳細・公開日・予告編などの取得処理にPromiseキャッシュを導入し、同じデータへの重複リクエストを抑制しました。
+
+通信失敗時はキャッシュを削除し、再取得できるようにしています。
+
+### 検索結果の並び替え
+
+映画名検索では、検索結果が100件以下の場合に全ページ分のデータを取得し、クライアント側で並び替えを行います。
+
+100件を超える場合は通信量を考慮して全件取得を行わず、並び替えを無効化しています。
+
+### Reactによる状態管理
+
+検索条件、ページ番号、読み込み状態、エラー、お気に入りなどをReactで管理しています。
+
+お気に入り操作では`useRef`を使用して最新データを参照し、連続操作時の状態の競合を防ぐようにしています。
+
+また、検索条件の変更時には、古いAPI通信の結果が新しい画面状態を上書きしないようにしています。
+
+### APIキーの保護
+
+TMDB APIキーはフロントエンドに埋め込まず、サーバー側の環境変数`TMDB_API_KEY`で管理しています。
+
+ブラウザからはVercel Functions経由でTMDB APIにアクセスし、利用可能なAPIパスとパラメータを制限しています。
+
+## ローカル開発
+
+Node.jsとnpmが必要です。
+
+依存パッケージをインストールします。
+
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+プロジェクト直下の`.env`に`TMDB_API_KEY`を設定します。APIキーはGitにコミットしないでください。
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+APIテストサーバーを起動します。
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+node --experimental-strip-types scripts/test-tmdb.mjs
 ```
+
+別のターミナルでViteを起動します。
+
+```bash
+npm run dev
+```
+
+コードチェックとビルドは以下のコマンドで実行できます。
+
+```bash
+npm run lint
+npm run build
+```
+
+## TMDBについて
+
+本アプリでは映画情報の取得にTMDB APIを使用しています。
+
+This product uses the TMDB API but is not endorsed or certified by TMDB.
+
+映画情報・画像などの権利は、それぞれの権利者に帰属します。
+
+## 制作目的
+
+React・TypeScriptを用いたフロントエンド開発、API連携、状態管理、既存アプリケーションのリファクタリングを学び、実践するために個人開発しました。
