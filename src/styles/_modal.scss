@@ -1,5 +1,4 @@
 /* モーダル背景 */
-/* モーダル背景 */
 .modal {
   position: fixed;
   inset: 0;
@@ -47,7 +46,7 @@
 
   background: rgb(32 40 56 / 70%);
   backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(30px);
   border: 1px solid rgb(255 255 255 / 12%);
   border-radius: 12px;
 
@@ -273,4 +272,10 @@
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+// Production環境でモーダルのブラーが無効になる問題への対策
+.modal.show .modal-content {
+  -webkit-backdrop-filter: blur(30px) !important;
+  backdrop-filter: blur(30px) !important;
 }
