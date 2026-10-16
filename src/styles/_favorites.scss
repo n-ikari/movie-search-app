@@ -73,7 +73,7 @@
 
   @media (max-width: 600px) {
     right: 12px;
-    bottom: 12px;
+    bottom: 40px;
     padding: 10px 14px;
     font-size: 13px;
   }
@@ -99,4 +99,5 @@
   width: fit-content;
   margin: 12px 0 24px;
   margin-left: max(12px, calc((100% - 1200px) / 2));
+  background: linear-gradient(135deg, #4678d9, #7855c9);
 }
